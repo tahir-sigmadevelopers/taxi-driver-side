@@ -183,7 +183,7 @@ const RidesScreen = ({ navigation, route }) => {
       <TouchableOpacity 
         style={[
           styles.locationButton, 
-          { bottom: showRideRequest ? 330 : 40 }
+          { bottom: showRideRequest ? 280 : 40 }
         ]}
       >
         <Ionicons name="locate" size={22} color="#000000" />
@@ -392,8 +392,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
-    paddingTop: 30,
+    padding: 16,
+    paddingTop: 20,
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -403,16 +403,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    marginTop: 30,
   },
   rideRequestHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   rideRequestTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#000000',
   },
@@ -423,10 +422,10 @@ const styles = StyleSheet.create({
   passengerInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F2',
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   passengerImage: {
     width: 50,
@@ -438,39 +437,39 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   passengerName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   paymentMethod: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666666',
   },
   routeContainer: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   routePoint: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 6,
   },
   pickupPoint: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: '#000000',
-    marginRight: 15,
+    marginRight: 12,
   },
   dropoffPoint: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: '#FFD600',
-    marginRight: 15,
+    marginRight: 12,
   },
   routeText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#000000',
     flex: 1,
   },
@@ -490,11 +489,11 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 8,
   },
   declineButton: {
     flex: 1,
-    paddingVertical: 16,
+    paddingVertical: 14,
     alignItems: 'center',
     marginRight: 10,
   },
@@ -507,7 +506,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFD600',
     borderRadius: 30,
-    paddingVertical: 16,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   acceptButtonText: {
