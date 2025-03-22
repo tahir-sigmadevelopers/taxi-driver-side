@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AppStack from './src/navigation/AppStack';
 import AuthStack from './src/navigation/AuthStack';
 import RideInProgressScreen from './src/screens/app/RideInProgressScreen';
+import DirectionScreen from './src/screens/app/DirectionScreen';
 
 // Ignore specific warnings (optional)
 LogBox.ignoreLogs([
@@ -31,6 +32,10 @@ export default function App() {
               <RootStack.Screen 
                 name="RideInProgressScreen" 
                 component={RideInProgressScreen} 
+              />
+              <RootStack.Screen 
+                name="DirectionScreen" 
+                component={DirectionScreen} 
               />
             </>
           ) : (

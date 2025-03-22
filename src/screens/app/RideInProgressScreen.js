@@ -29,9 +29,14 @@ const RideInProgressScreen = ({ navigation, route }) => {
 
   // Handle continue button press
   const handleContinue = () => {
-    // This would progress to the next step in a real app
-    // For now, just go back to the previous screen
-    navigation.goBack();
+    // Navigate to directions screen
+    navigation.navigate('DirectionScreen', { rideDetails });
+  };
+  
+  // Handle location button press
+  const handleLocationPress = () => {
+    // Navigate to directions screen
+    navigation.navigate('DirectionScreen', { rideDetails });
   };
 
   return (
@@ -73,7 +78,10 @@ const RideInProgressScreen = ({ navigation, route }) => {
       </SafeAreaView>
       
       {/* Location Button */}
-      <TouchableOpacity style={styles.locationButton}>
+      <TouchableOpacity 
+        style={styles.locationButton}
+        onPress={handleLocationPress}
+      >
         <Ionicons name="locate" size={22} color="#000000" />
       </TouchableOpacity>
       

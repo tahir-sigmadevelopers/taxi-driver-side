@@ -106,24 +106,51 @@ const HomeScreen = ({ navigation, route }) => {
       </MapView>
       
       {/* Header */}
-      <SafeAreaView style={styles.header}>
-        <TouchableOpacity style={styles.headerBackButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="black" />
+      <SafeAreaView style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.menuButton} 
+          onPress={() => navigation.openDrawer()}
+        >
+          <Ionicons name="menu" size={24} color="black" />
         </TouchableOpacity>
         
-        <View style={styles.profileContainer}>
-          <Ionicons name="person" size={20} color="#FFD600" />
-        </View>
-        
         <View style={styles.onlineToggleContainer}>
-          <Text style={styles.onlineText}>Online</Text>
+          <Text style={styles.onlineStatus}>{isOnline ? 'Online' : 'Offline'}</Text>
           <TouchableOpacity 
-            style={[styles.onlineToggle, isOnline ? styles.onlineToggleActive : null]} 
+            style={[
+              styles.toggleButton, 
+              isOnline ? styles.toggleButtonActive : styles.toggleButtonInactive
+            ]}
             onPress={handleToggleOnline}
           >
-            <View style={[styles.toggleCircle, isOnline ? styles.toggleCircleActive : null]} />
+            <View 
+              style={[
+                styles.toggleCircle, 
+                isOnline ? styles.toggleCircleRight : styles.toggleCircleLeft
+              ]} 
+            />
           </TouchableOpacity>
         </View>
+        
+        {/* Test Button - Remove in production */}
+        <TouchableOpacity 
+          style={styles.testButton} 
+          onPress={() => {
+            const rootNavigation = navigation.getParent();
+            if (rootNavigation) {
+              rootNavigation.navigate('DirectionScreen', { 
+                rideDetails: {
+                  passengerName: 'Esther Howard',
+                  paymentMethod: 'Cash Payment',
+                  pickup: '6391 Elgin St. Celina, Delaware 10299',
+                  dropoff: '1901 Thoridgr Cir Shiloh'
+                }
+              });
+            }
+          }}
+        >
+          <Text style={styles.testButtonText}>Test Directions</Text>
+        </TouchableOpacity>
       </SafeAreaView>
       
       {/* Stats Cards */}
@@ -221,7 +248,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: '#E6EEF5', // Light blue-gray background
   },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -229,20 +256,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 10,
     zIndex: 10,
   },
-  headerBackButton: {
-    height: 40,
-    width: 40,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  profileContainer: {
+  menuButton: {
     height: 40,
     width: 40,
     borderRadius: 20,
@@ -268,11 +282,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  onlineText: {
+  onlineStatus: {
     marginRight: 8,
     fontWeight: '600',
   },
-  onlineToggle: {
+  toggleButton: {
     width: 40,
     height: 24,
     borderRadius: 12,
@@ -280,8 +294,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 2,
   },
-  onlineToggleActive: {
+  toggleButtonActive: {
     backgroundColor: '#FFD600',
+  },
+  toggleButtonInactive: {
+    backgroundColor: '#E0E0E0',
   },
   toggleCircle: {
     width: 20,
@@ -289,8 +306,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
   },
-  toggleCircleActive: {
+  toggleCircleRight: {
     marginLeft: 'auto',
+  },
+  toggleCircleLeft: {
+    marginRight: 'auto',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -493,6 +513,19 @@ const styles = StyleSheet.create({
   acceptButtonText: {
     color: '#000000',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  testButton: {
+    position: 'absolute',
+    right: 20,
+    backgroundColor: '#FFD600',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  testButtonText: {
+    fontSize: 12,
+    color: '#000000',
     fontWeight: '600',
   },
 });
