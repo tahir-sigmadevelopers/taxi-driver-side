@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
+import RideInProgressScreen from '../screens/app/RideInProgressScreen';
 
 // For future auth state management
 // import auth from '../services/auth';
@@ -23,7 +24,7 @@ const Navigation = () => {
       try {
         // const user = await auth.getCurrentUser();
         // setIsAuthenticated(!!user);
-        setIsAuthenticated(false); // Default to not authenticated for demo
+        setIsAuthenticated(true); // Set to true for testing
       } catch (error) {
         console.error('Authentication error:', error);
         setIsAuthenticated(false);
@@ -49,7 +50,14 @@ const Navigation = () => {
         }}
       >
         {isAuthenticated ? (
-          <RootStack.Screen name="App" component={AppStack} />
+          <>
+            <RootStack.Screen name="App" component={AppStack} />
+            {/* Add RideInProgressScreen at root level for direct access */}
+            <RootStack.Screen 
+              name="RideInProgressScreen" 
+              component={RideInProgressScreen} 
+            />
+          </>
         ) : (
           <RootStack.Screen name="Auth" component={AuthStack} />
         )}

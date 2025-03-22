@@ -2,7 +2,10 @@ import React from 'react';
 import { LogBox, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
-import Navigation from './src/navigation';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AppStack from './src/navigation/AppStack';
+import AuthStack from './src/navigation/AuthStack';
+import RideInProgressScreen from './src/screens/app/RideInProgressScreen';
 
 // Ignore specific warnings (optional)
 LogBox.ignoreLogs([
@@ -11,11 +14,30 @@ LogBox.ignoreLogs([
   'Require cycle',
 ]);
 
+const RootStack = createNativeStackNavigator();
+
 export default function App() {
+  // For demo purposes, always show the app (not auth)
+  const isAuthenticated = true;
+
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <Navigation />
+      <NavigationContainer>
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          {isAuthenticated ? (
+            <>
+              <RootStack.Screen name="Main" component={AppStack} />
+              <RootStack.Screen 
+                name="RideInProgressScreen" 
+                component={RideInProgressScreen} 
+              />
+            </>
+          ) : (
+            <RootStack.Screen name="Auth" component={AuthStack} />
+          )}
+        </RootStack.Navigator>
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 } 

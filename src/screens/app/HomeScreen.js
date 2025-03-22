@@ -51,17 +51,39 @@ const HomeScreen = ({ navigation, route }) => {
   
   const handleAcceptRide = () => {
     setShowRideRequest(false);
-    // Navigate to ride details or update UI to show accepted ride
-    navigation.navigate('RideInProgress', { 
-      rideDetails: {
-        passengerName: 'Esther Howard',
-        paymentMethod: 'Cash Payment',
-        pickup: '6391 Westheimer RD. San Francisco',
-        dropoff: '1901 Thoridgr Cir Shiloh'
+    
+    try {
+      // Use getParent to access the root navigator
+      const rootNavigation = navigation.getParent();
+      if (rootNavigation) {
+        // Navigate using the root navigator which has access to RideInProgressScreen
+        rootNavigation.navigate('RideInProgressScreen', { 
+          rideDetails: {
+            passengerName: 'Esther Howard',
+            paymentMethod: 'Cash Payment',
+            pickup: '6391 Westheimer RD. San Francisco',
+            dropoff: '1901 Thoridgr Cir Shiloh'
+          }
+        });
+        console.log('Navigating via root navigator');
+      } else {
+        // Fallback to direct navigation
+        navigation.navigate('RideInProgressScreen', { 
+          rideDetails: {
+            passengerName: 'Esther Howard',
+            paymentMethod: 'Cash Payment',
+            pickup: '6391 Westheimer RD. San Francisco',
+            dropoff: '1901 Thoridgr Cir Shiloh'
+          }
+        });
+        console.log('Navigating directly');
       }
-    });
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
   
+ 
   const handleDeclineRide = () => {
     setShowRideRequest(false);
     // In a real app, you'd notify the backend that the ride was declined

@@ -8,6 +8,7 @@ import HomeScreen from '../screens/app/HomeScreen';
 import RidesScreen from '../screens/app/RidesScreen';
 import EarningsScreen from '../screens/app/EarningsScreen';
 import AccountScreen from '../screens/app/AccountScreen';
+import RideInProgressScreen from '../screens/app/RideInProgressScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -16,6 +17,7 @@ const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
+      key="MainTabNavigator"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: '#FFD600',
@@ -44,7 +46,7 @@ const MainTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={RidesScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Rides" component={RidesScreen} />
       <Tab.Screen name="Earnings" component={EarningsScreen} />
       <Tab.Screen name="Account" component={AccountScreen} />
@@ -61,11 +63,11 @@ const AppStack = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      {/* Standalone screens that need to be accessible from anywhere */}
+      <Stack.Screen name="RideInProgressScreen" component={RideInProgressScreen} />
       
-      {/* Standalone screens */}
-      <Stack.Screen name="RideInProgress" component={HomeScreen} />
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      {/* Main tab navigator */}
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
     </Stack.Navigator>
   );
 };
