@@ -32,11 +32,8 @@ const WelcomeScreen = ({ navigation, route }) => {
 
   const handleModalClose = () => {
     setShowSubmissionModal(false);
-    // Navigate to the main app
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'App' }],
-    });
+    // Navigate to LocationPermissionScreen instead of directly to App
+    navigation.navigate('LocationPermission');
   };
 
   return (

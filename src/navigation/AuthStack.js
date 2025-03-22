@@ -17,6 +17,13 @@ import BankAccountDetailsScreen from '../screens/profile/BankAccountDetailsScree
 import DrivingDetailsScreen from '../screens/profile/DrivingDetailsScreen';
 import GovernmentIDScreen from '../screens/profile/GovernmentIDScreen';
 
+// Location permission screen
+import LocationPermissionScreen from '../screens/app/LocationPermissionScreen';
+
+// Import App screens for direct navigation
+import HomeScreen from '../screens/app/HomeScreen';
+import RidesScreen from '../screens/app/RidesScreen';
+
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
@@ -41,6 +48,13 @@ const AuthStack = () => {
       <Stack.Screen name="BankAccountDetails" component={BankAccountDetailsScreen} />
       <Stack.Screen name="DrivingDetails" component={DrivingDetailsScreen} />
       <Stack.Screen name="GovernmentID" component={GovernmentIDScreen} />
+      
+      {/* Location permission as part of auth flow */}
+      <Stack.Screen name="LocationPermission" component={LocationPermissionScreen} />
+      
+      {/* Main app entry points */}
+      <Stack.Screen name="Main" component={RidesScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
     </Stack.Navigator>
   );
 };

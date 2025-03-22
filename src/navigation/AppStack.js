@@ -1,52 +1,32 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from 'react-native-vector-icons';
 
 // Import screens
-import HomeScreen from '../screens/main/HomeScreen';
-import RidesScreen from '../screens/main/RidesScreen';
-import EarningsScreen from '../screens/main/EarningsScreen';
-import AccountScreen from '../screens/main/AccountScreen';
+import HomeScreen from '../screens/app/HomeScreen';
+import RidesScreen from '../screens/app/RidesScreen';
+import EarningsScreen from '../screens/app/EarningsScreen';
+import AccountScreen from '../screens/app/AccountScreen';
 
-const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-// Stacks for each tab
-const HomeStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="HomeMain" component={HomeScreen} />
-    {/* Add other Home-related screens here */}
-  </Stack.Navigator>
-);
-
-const RidesStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="RidesMain" component={RidesScreen} />
-    {/* Add other Rides-related screens here */}
-  </Stack.Navigator>
-);
-
-const EarningsStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="EarningsMain" component={EarningsScreen} />
-    {/* Add other Earnings-related screens here */}
-  </Stack.Navigator>
-);
-
-const AccountStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="AccountMain" component={AccountScreen} />
-    {/* Add other Account-related screens here */}
-  </Stack.Navigator>
-);
-
-// Main Tab Navigator
-const AppStack = () => {
+// Main tab navigator
+const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarActiveTintColor: '#FFD600',
+        tabBarInactiveTintColor: '#999999',
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#EEEEEE',
+          paddingTop: 5,
+          height: 60,
+        },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -62,23 +42,31 @@ const AppStack = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#FFD600',
-        tabBarInactiveTintColor: 'gray',
-        tabBarStyle: {
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-        },
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Rides" component={RidesStack} />
-      <Tab.Screen name="Earnings" component={EarningsStack} />
-      <Tab.Screen name="Account" component={AccountStack} />
+      <Tab.Screen name="Home" component={RidesScreen} />
+      <Tab.Screen name="Rides" component={RidesScreen} />
+      <Tab.Screen name="Earnings" component={EarningsScreen} />
+      <Tab.Screen name="Account" component={AccountScreen} />
     </Tab.Navigator>
+  );
+};
+
+// App stack navigator with screens that are above the tab navigator
+const AppStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName="MainTabs"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      
+      {/* Standalone screens */}
+      <Stack.Screen name="RideInProgress" component={HomeScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+    </Stack.Navigator>
   );
 };
 
