@@ -131,46 +131,6 @@ const HomeScreen = ({ navigation, route }) => {
             />
           </TouchableOpacity>
         </View>
-        
-        {/* Test Button - Remove in production */}
-        <TouchableOpacity 
-          style={[styles.testButton, { bottom: 30 }]} 
-          onPress={() => {
-            const rootNavigation = navigation.getParent();
-            if (rootNavigation) {
-              rootNavigation.navigate('DirectionScreen', { 
-                rideDetails: {
-                  passengerName: 'Esther Howard',
-                  paymentMethod: 'Cash Payment',
-                  pickup: '6391 Elgin St. Celina, Delaware 10299',
-                  dropoff: '1901 Thoridgr Cir Shiloh'
-                }
-              });
-            }
-          }}
-        >
-          <Text style={styles.testButtonText}>Test Directions</Text>
-        </TouchableOpacity>
-        
-        {/* Test Arrival Button - Remove in production */}
-        <TouchableOpacity 
-          style={[styles.testButton, { bottom: 70 }]} 
-          onPress={() => {
-            const rootNavigation = navigation.getParent();
-            if (rootNavigation) {
-              rootNavigation.navigate('ArrivalScreen', { 
-                rideDetails: {
-                  passengerName: 'Esther Howard',
-                  paymentMethod: 'Cash Payment',
-                  pickup: '6391 Elgin St. Celina, Delaware 10299',
-                  dropoff: '1901 Thoridgr Cir Shiloh'
-                }
-              });
-            }
-          }}
-        >
-          <Text style={styles.testButtonText}>Test Arrival</Text>
-        </TouchableOpacity>
       </SafeAreaView>
       
       {/* Stats Cards */}
@@ -533,19 +493,6 @@ const styles = StyleSheet.create({
   acceptButtonText: {
     color: '#000000',
     fontSize: 16,
-    fontWeight: '600',
-  },
-  testButton: {
-    position: 'absolute',
-    right: 20,
-    backgroundColor: '#FFD600',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  testButtonText: {
-    fontSize: 12,
-    color: '#000000',
     fontWeight: '600',
   },
 });

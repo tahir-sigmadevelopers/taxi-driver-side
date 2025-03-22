@@ -8,6 +8,7 @@ import AuthStack from './src/navigation/AuthStack';
 import RideInProgressScreen from './src/screens/app/RideInProgressScreen';
 import DirectionScreen from './src/screens/app/DirectionScreen';
 import ArrivalScreen from './src/screens/app/ArrivalScreen';
+import OTPVerificationScreen from './src/screens/app/OTPVerificationScreen';
 
 // Ignore specific warnings (optional)
 LogBox.ignoreLogs([
@@ -41,6 +42,10 @@ export default function App() {
               <RootStack.Screen 
                 name="ArrivalScreen" 
                 component={ArrivalScreen} 
+              />
+              <RootStack.Screen 
+                name="OTPVerificationScreen" 
+                component={OTPVerificationScreen} 
               />
             </>
           ) : (

@@ -28,10 +28,17 @@ const ArrivalScreen = ({ navigation, route }) => {
 
   // Handle OTP button press
   const handleAskForOTP = () => {
-    // In a real app, this would prompt the customer for an OTP
-    console.log('Requesting OTP from customer');
-    // Navigate back to main for now
-    navigation.navigate('Main');
+    // In a real app, this would prompt the customer for an OTP via SMS/notification
+    console.log('Requesting OTP verification');
+    
+    // Navigate to OTP verification screen
+    navigation.navigate('OTPVerificationScreen', {
+      rideDetails: {
+        ...rideDetails,
+        passengerName: rideDetails.passengerName || 'Esther Howard',
+        passengerMobile: rideDetails.passengerMobile || '+1 (555) 123-4567',
+      }
+    });
   };
 
   return (
