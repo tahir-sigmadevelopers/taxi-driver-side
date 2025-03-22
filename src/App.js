@@ -23,13 +23,18 @@ const RootStack = createNativeStackNavigator();
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // For demonstration purposes, we're bypassing authentication check
+  const bypassAuth = true;
 
   useEffect(() => {
     // Check if user is authenticated
     const checkAuth = async () => {
       // Simulate checking authentication status
       await new Promise(resolve => setTimeout(resolve, 1000));
-      setIsAuthenticated(authService.isAuthenticated);
+      
+      // Use bypassAuth to force show the main app
+      setIsAuthenticated(bypassAuth || authService.isAuthenticated);
       setIsLoading(false);
     };
 

@@ -15,11 +15,7 @@ import { Ionicons, MaterialIcons, FontAwesome } from 'react-native-vector-icons'
 // Mock map component (in a real app, you'd use react-native-maps)
 const MapView = ({ children, style }) => (
   <View style={[styles.mapContainer, style]}>
-    <Image 
-      source={{ uri: 'https://maps.googleapis.com/maps/api/staticmap?center=40.7128,-74.0060&zoom=14&size=600x600&key=YOUR_API_KEY' }} 
-      style={styles.mapImage}
-      resizeMode="cover"
-    />
+    <View style={styles.mockMapBackground} />
     {children}
   </View>
 );
@@ -195,9 +191,13 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#E5E5E5', // Fallback color
   },
-  mapImage: {
-    width: '100%',
-    height: '100%',
+  mockMapBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#E6EEF5', // Light blue-gray background
   },
   header: {
     flexDirection: 'row',

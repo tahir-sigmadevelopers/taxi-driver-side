@@ -15,11 +15,7 @@ import { Ionicons } from 'react-native-vector-icons';
 // Mock map component (in a real app, you'd use react-native-maps)
 const MapView = ({ children, style }) => (
   <View style={[styles.mapContainer, style]}>
-    <Image 
-      source={{ uri: 'https://maps.googleapis.com/maps/api/staticmap?center=40.7128,-74.0060&zoom=14&size=600x600&key=YOUR_API_KEY' }} 
-      style={styles.mapImage}
-      resizeMode="cover"
-    />
+    <View style={styles.mockMapBackground} />
     {children}
   </View>
 );
@@ -75,36 +71,41 @@ const RidesScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
-      <MapView style={styles.mapView}>
-        {/* Countdown timer circle */}
-        {showRideRequest && (
-          <View style={styles.countdownContainer}>
+      <MapView style={styles.mapView} />
+      
+      {/* Countdown timer circle - moved outside MapView */}
+      {showRideRequest && (
+        <View style={styles.countdownContainer}>
+          <View style={styles.countdownCircle}>
+            <View style={styles.countdownArc} />
             <View style={styles.countdownInner}>
               <Text style={styles.countdownNumber}>{countdownSeconds}</Text>
               <Text style={styles.countdownLabel}>Seconds</Text>
             </View>
           </View>
-        )}
-      </MapView>
+        </View>
+      )}
       
       {/* Header */}
-      <SafeAreaView style={styles.header}>
+      <SafeAreaView style={styles.headerContainer}>
         <TouchableOpacity style={styles.headerBackButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         
-        <View style={styles.profileContainer}>
-          <Ionicons name="person" size={20} color="#FFD600" />
-        </View>
-        
-        <View style={styles.onlineToggleContainer}>
-          <Text style={styles.onlineText}>Online</Text>
-          <TouchableOpacity 
-            style={[styles.onlineToggle, isOnline ? styles.onlineToggleActive : null]} 
-            onPress={handleToggleOnline}
-          >
-            <View style={[styles.toggleCircle, isOnline ? styles.toggleCircleActive : null]} />
-          </TouchableOpacity>
+        <View style={styles.userAndToggleRow}>
+          <View style={styles.profileContainer}>
+            <Ionicons name="person" size={20} color="#FFD600" />
+          </View>
+          
+          <View style={styles.onlineToggleContainer}>
+            <Text style={styles.onlineText}>Online</Text>
+            <TouchableOpacity 
+              style={[styles.onlineToggle, isOnline ? styles.onlineToggleActive : null]} 
+              onPress={handleToggleOnline}
+            >
+              <View style={[styles.toggleCircle, isOnline ? styles.toggleCircleActive : null]} />
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
       
@@ -112,7 +113,7 @@ const RidesScreen = ({ navigation, route }) => {
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <View style={styles.statIconContainer}>
-            <Ionicons name="calendar" size={24} color="#FFD600" />
+            <Ionicons name="calendar" size={24} color="#000000" />
           </View>
           <View style={styles.statTextContainer}>
             <Text style={styles.statLabel}>Pre - Booked</Text>
@@ -177,6 +178,16 @@ const RidesScreen = ({ navigation, route }) => {
           </View>
         </View>
       )}
+
+      {/* Location Button */}
+      <TouchableOpacity 
+        style={[
+          styles.locationButton, 
+          { bottom: showRideRequest ? 330 : 40 }
+        ]}
+      >
+        <Ionicons name="locate" size={22} color="#000000" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -193,18 +204,18 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#E5E5E5', // Fallback color
   },
-  mapImage: {
-    width: '100%',
-    height: '100%',
+  mockMapBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#E6EEF5', // Light blue-gray background that matches the image
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  headerContainer: {
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 10,
+    paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight + 10,
     zIndex: 10,
   },
   headerBackButton: {
@@ -219,6 +230,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  userAndToggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
   },
   profileContainer: {
     height: 40,
@@ -251,9 +268,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   onlineToggle: {
-    width: 40,
-    height: 24,
-    borderRadius: 12,
+    width: 50,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#E0E0E0',
     justifyContent: 'center',
     paddingHorizontal: 2,
@@ -262,9 +279,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFD600',
   },
   toggleCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: '#FFFFFF',
   },
   toggleCircleActive: {
@@ -320,7 +337,7 @@ const styles = StyleSheet.create({
   },
   countdownContainer: {
     position: 'absolute',
-    top: '50%',
+    top: '42%',
     left: '50%',
     transform: [
       { translateX: -45 },
@@ -328,35 +345,55 @@ const styles = StyleSheet.create({
     ],
     width: 90,
     height: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
+    marginBottom: 60,
+  },
+  countdownCircle: {
+    width: 90,
+    height: 90,
     borderRadius: 45,
-    borderWidth: 5,
-    borderColor: '#FFD600',
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 4,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
   },
+  countdownArc: {
+    position: 'absolute',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 5,
+    borderLeftColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderRightColor: '#FFD600',
+    borderTopColor: '#FFD600',
+    transform: [{ rotate: '135deg' }],
+  },
   countdownInner: {
     alignItems: 'center',
   },
   countdownNumber: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#FFD600',
   },
   countdownLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#666666',
+    marginTop: -2,
   },
   rideRequestContainer: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingTop: 30,
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -366,26 +403,30 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    marginTop: 30,
   },
   rideRequestHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   rideRequestTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#000000',
   },
   rideRequestTime: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666666',
   },
   passengerInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F2F2F2',
+    paddingBottom: 20,
   },
   passengerImage: {
     width: 50,
@@ -397,34 +438,34 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   passengerName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 4,
   },
   paymentMethod: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666666',
   },
   routeContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   routePoint: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
+    marginVertical: 8,
   },
   pickupPoint: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#000000',
     marginRight: 15,
   },
   dropoffPoint: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#FFD600',
     marginRight: 15,
   },
@@ -438,40 +479,56 @@ const styles = StyleSheet.create({
     borderColor: '#EEEEEE',
     borderRadius: 20,
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     alignSelf: 'flex-end',
-    marginVertical: 8,
+    marginVertical: 10,
   },
   tripDurationText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#666666',
   },
   actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 10,
   },
   declineButton: {
     flex: 1,
-    paddingVertical: 15,
+    paddingVertical: 16,
     alignItems: 'center',
     marginRight: 10,
   },
   declineButtonText: {
     color: '#FFD600',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   acceptButton: {
     flex: 1,
     backgroundColor: '#FFD600',
     borderRadius: 30,
-    paddingVertical: 15,
+    paddingVertical: 16,
     alignItems: 'center',
   },
   acceptButtonText: {
     color: '#000000',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
+  },
+  locationButton: {
+    position: 'absolute',
+    right: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });
 
