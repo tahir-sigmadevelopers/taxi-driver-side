@@ -17,7 +17,7 @@ Mobile application for ride-sharing service drivers built with React Native and 
 
 2. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://github.com/tahir-sigmadevelopers/taxi-driver-side.git
    ```
 
 3. Navigate to the driver app directory:
