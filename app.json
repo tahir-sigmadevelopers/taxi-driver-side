@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "RideWave Driver",
+    "slug": "ridewave-driver",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ridewave.driver",
+      "config": {
+        "googleMapsApiKey": "AlzaSys8SiMctQ5kBREAf8BkaR-BQNwq5GY3TEf"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.ridewave.driver",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AlzaSys8SiMctQ5kBREAf8BkaR-BQNwq5GY3TEf"
+        }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      "@react-native-firebase/app"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d278cb03-ef2b-4caa-a6d5-6534eafbdd7d"
+      }
+    }
+  }
+} 

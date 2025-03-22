@@ -1,0 +1,71 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native builds
+ios/build/
+ios/Pods/
+ios/Podfile.lock
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+*.hprof
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# VSCode
+.vscode/
+
+# Editor and IDE files
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.settings/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Testing
+coverage/
+
+# Build outputs
+*.jsbundle
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.log
+
+# Debugging
+.watchmanconfig
+
+# Cache
+.eslintcache
+.cache/
+
+# React Native specific
+.watchman_cookie 
