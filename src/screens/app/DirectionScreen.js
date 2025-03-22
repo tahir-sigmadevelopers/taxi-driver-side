@@ -29,10 +29,14 @@ const DirectionScreen = ({ navigation, route }) => {
   // Handle navigation button press
   const handleNavigateToCustomer = () => {
     // In a real app, this would open the device's map application 
-    // or handle in-app navigation
+    // or navigate the driver to the customer location
     console.log('Navigating to customer location');
-    // For now, just go back to the previous screen
-    navigation.goBack();
+    
+    // Simulate arrival after navigation - in a real app this would happen
+    // after location tracking confirms arrival at destination
+    setTimeout(() => {
+      navigation.navigate('ArrivalScreen', { rideDetails });
+    }, 500); // Short delay to simulate navigation
   };
 
   return (

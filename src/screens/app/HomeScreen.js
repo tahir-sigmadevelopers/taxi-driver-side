@@ -134,7 +134,7 @@ const HomeScreen = ({ navigation, route }) => {
         
         {/* Test Button - Remove in production */}
         <TouchableOpacity 
-          style={styles.testButton} 
+          style={[styles.testButton, { bottom: 30 }]} 
           onPress={() => {
             const rootNavigation = navigation.getParent();
             if (rootNavigation) {
@@ -150,6 +150,26 @@ const HomeScreen = ({ navigation, route }) => {
           }}
         >
           <Text style={styles.testButtonText}>Test Directions</Text>
+        </TouchableOpacity>
+        
+        {/* Test Arrival Button - Remove in production */}
+        <TouchableOpacity 
+          style={[styles.testButton, { bottom: 70 }]} 
+          onPress={() => {
+            const rootNavigation = navigation.getParent();
+            if (rootNavigation) {
+              rootNavigation.navigate('ArrivalScreen', { 
+                rideDetails: {
+                  passengerName: 'Esther Howard',
+                  paymentMethod: 'Cash Payment',
+                  pickup: '6391 Elgin St. Celina, Delaware 10299',
+                  dropoff: '1901 Thoridgr Cir Shiloh'
+                }
+              });
+            }
+          }}
+        >
+          <Text style={styles.testButtonText}>Test Arrival</Text>
         </TouchableOpacity>
       </SafeAreaView>
       
