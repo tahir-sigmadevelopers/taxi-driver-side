@@ -61,7 +61,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'Cars', 
       icon: 'car-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Cars pressed') 
+      onPress: () => navigation.navigate('CarsScreen') 
     },
     { 
       id: 'help', 
