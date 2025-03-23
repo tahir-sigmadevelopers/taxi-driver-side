@@ -12,12 +12,12 @@ import {
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
 
-const CarPUCScreen = ({ navigation }) => {
+const BackSideScreen = ({ navigation }) => {
   const [uploadedDocument, setUploadedDocument] = useState({
-    name: 'PUC',
+    name: 'Back Side',
     type: 'PNG',
     size: '400 kb',
-    uri: 'https://i.ibb.co/rsMxqZf/cheque.png', // Example image URL
+    uri: 'https://i.ibb.co/F4g9rJX/document-handover.jpg', // Example image URL
   });
 
   const handleUpload = () => {
@@ -30,9 +30,9 @@ const CarPUCScreen = ({ navigation }) => {
     setUploadedDocument(null);
   };
 
-  const handleNext = () => {
-    // Navigate to back side screen
-    navigation.navigate('BackSideScreen');
+  const handleDone = () => {
+    // Save and go back to the car documents screen
+    navigation.navigate('CarDocumentsScreen');
   };
 
   return (
@@ -48,7 +48,7 @@ const CarPUCScreen = ({ navigation }) => {
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         
-        <Text style={styles.headerTitle}>Car PUC</Text>
+        <Text style={styles.headerTitle}>Back Side</Text>
       </View>
       
       <ScrollView style={styles.scrollContainer}>
@@ -58,7 +58,7 @@ const CarPUCScreen = ({ navigation }) => {
             <View style={styles.stepIconContainer}>
               <Ionicons name="checkmark" size={20} color="#FFFFFF" />
             </View>
-            <Text style={styles.stepText}>Upload Valid PUC Slip</Text>
+            <Text style={styles.stepText}>Upload Clear Image</Text>
           </View>
           
           <View style={styles.stepItem}>
@@ -72,7 +72,7 @@ const CarPUCScreen = ({ navigation }) => {
         <View style={styles.divider} />
         
         {/* Upload Section */}
-        <Text style={styles.sectionTitle}>Attach PUC Details (Front Side)</Text>
+        <Text style={styles.sectionTitle}>Attach PUC Details (Back Side)</Text>
         
         <TouchableOpacity 
           style={styles.uploadContainer}
@@ -112,13 +112,13 @@ const CarPUCScreen = ({ navigation }) => {
         )}
       </ScrollView>
       
-      {/* Next Button */}
+      {/* Done Button */}
       <View style={styles.bottomButtonContainer}>
         <TouchableOpacity 
           style={styles.doneButton}
-          onPress={handleNext}
+          onPress={handleDone}
         >
-          <Text style={styles.doneButtonText}>Next</Text>
+          <Text style={styles.doneButtonText}>Done</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -280,4 +280,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CarPUCScreen; 
+export default BackSideScreen; 
