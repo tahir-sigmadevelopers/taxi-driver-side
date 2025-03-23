@@ -40,7 +40,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'Your Rides', 
       icon: 'time-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Your Rides pressed') 
+      onPress: () => navigation.navigate('Booking')
     },
     { 
       id: 'prebooked', 

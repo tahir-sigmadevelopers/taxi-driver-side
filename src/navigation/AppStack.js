@@ -5,7 +5,7 @@ import { Ionicons } from 'react-native-vector-icons';
 
 // Import screens
 import HomeScreen from '../screens/app/HomeScreen';
-import RidesScreen from '../screens/app/RidesScreen';
+import BookingScreen from '../screens/app/BookingScreen';
 import EarningsScreen from '../screens/app/EarningsScreen';
 import AccountScreen from '../screens/app/AccountScreen';
 import RideInProgressScreen from '../screens/app/RideInProgressScreen';
@@ -38,7 +38,7 @@ const MainTabNavigator = () => {
 
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Rides') {
+          } else if (route.name === 'Booking') {
             iconName = focused ? 'car' : 'car-outline';
           } else if (route.name === 'Earnings') {
             iconName = focused ? 'wallet' : 'wallet-outline';
@@ -51,7 +51,7 @@ const MainTabNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Rides" component={RidesScreen} />
+      <Tab.Screen name="Booking" component={BookingScreen} />
       <Tab.Screen name="Earnings" component={EarningsScreen} />
       <Tab.Screen name="Account" component={AccountScreen} />
     </Tab.Navigator>
