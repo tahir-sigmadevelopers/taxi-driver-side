@@ -38,6 +38,12 @@ const RideInProgressScreen = ({ navigation, route }) => {
     // Navigate to directions screen
     navigation.navigate('DirectionScreen', { rideDetails });
   };
+  
+  // Handle view destination button press
+  const handleViewDestination = () => {
+    // Navigate to destination screen
+    navigation.navigate('DestinationScreen', { rideDetails });
+  };
 
   return (
     <View style={styles.container}>
@@ -112,9 +118,15 @@ const RideInProgressScreen = ({ navigation, route }) => {
           </View>
         </View>
         
-        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.viewDestinationButton} onPress={handleViewDestination}>
+            <Text style={styles.viewDestinationButtonText}>View Destination</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -321,11 +333,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  viewDestinationButton: {
+    flex: 1,
+    borderWidth: 2,
+    borderColor: '#FFD600',
+    borderRadius: 30,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  viewDestinationButtonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   continueButton: {
+    flex: 1,
     backgroundColor: '#FFD600',
     borderRadius: 30,
     paddingVertical: 16,
     alignItems: 'center',
+    marginLeft: 10,
   },
   continueButtonText: {
     color: '#000000',

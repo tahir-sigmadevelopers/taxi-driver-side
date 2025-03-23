@@ -79,8 +79,8 @@ const OTPVerificationScreen = ({ navigation, route }) => {
       setIsVerifying(false);
       console.log('OTP verified successfully');
       
-      // Navigate to next screen (to be implemented)
-      navigation.navigate('Main');
+      // Navigate to the destination screen to begin the ride
+      navigation.navigate('DestinationScreen', { rideDetails });
     }, 1500);
   };
   
