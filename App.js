@@ -11,6 +11,7 @@ import ArrivalScreen from './src/screens/app/ArrivalScreen';
 import OTPVerificationScreen from './src/screens/app/OTPVerificationScreen';
 import DestinationScreen from './src/screens/app/DestinationScreen';
 import CashCollectionScreen from './src/screens/app/CashCollectionScreen';
+import RateRiderScreen from './src/screens/app/RateRiderScreen';
 
 // Ignore specific warnings (optional)
 LogBox.ignoreLogs([
@@ -56,6 +57,10 @@ export default function App() {
               <RootStack.Screen 
                 name="CashCollectionScreen" 
                 component={CashCollectionScreen} 
+              />
+              <RootStack.Screen 
+                name="RateRiderScreen" 
+                component={RateRiderScreen} 
               />
             </>
           ) : (

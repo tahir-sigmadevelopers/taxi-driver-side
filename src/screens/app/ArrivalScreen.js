@@ -123,7 +123,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight + 10,
+    paddingTop: Platform.OS === 'ios' ? 15 : StatusBar.currentHeight + 15,
+    paddingBottom: 15,
+    marginBottom: 5,
     zIndex: 20,
   },
   headerBackButton: {
@@ -138,6 +140,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    marginRight: 10,
   },
   headerTitle: {
     fontSize: 18,
