@@ -47,7 +47,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'Pre-Booked Rides', 
       icon: 'calendar-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Pre-Booked Rides pressed') 
+      onPress: () => navigation.navigate('PreBookedRidesScreen')
     },
     { 
       id: 'settings', 
@@ -129,7 +129,9 @@ const AccountScreen = ({ navigation }) => {
               <Ionicons name={item.icon} size={24} color={item.color} style={styles.menuIcon} />
               <Text style={styles.menuText}>{item.title}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#FFD600" />
+            <View>
+              <Ionicons name="chevron-forward" size={24} color="#FFD600" />
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
