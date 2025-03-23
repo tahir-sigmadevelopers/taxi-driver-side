@@ -20,6 +20,7 @@ import UpdateDocumentDetailsScreen from '../screens/app/UpdateDocumentDetailsScr
 import CarsScreen from '../screens/app/CarsScreen';
 import CarDocumentsScreen from '../screens/app/CarDocumentsScreen';
 import AddNewCarScreen from '../screens/app/AddNewCarScreen';
+import CarPUCScreen from '../screens/app/CarPUCScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -87,6 +88,7 @@ const AppStack = () => {
       <Stack.Screen name="CarsScreen" component={CarsScreen} />
       <Stack.Screen name="CarDocumentsScreen" component={CarDocumentsScreen} />
       <Stack.Screen name="AddNewCarScreen" component={AddNewCarScreen} />
+      <Stack.Screen name="CarPUCScreen" component={CarPUCScreen} />
       
       {/* Main tab navigator */}
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />

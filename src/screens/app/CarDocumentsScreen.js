@@ -17,7 +17,7 @@ const CarDocumentsScreen = ({ navigation }) => {
     {
       id: 'puc',
       title: 'Car PUC',
-      onPress: () => console.log('Car PUC pressed'),
+      onPress: () => navigation.navigate('CarPUCScreen'),
     },
     {
       id: 'insurance',
