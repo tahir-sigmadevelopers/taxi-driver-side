@@ -34,6 +34,10 @@ const CarsScreen = ({ navigation }) => {
     console.log('Delete car pressed');
   };
 
+  const handleAddNewCar = () => {
+    navigation.navigate('AddNewCarScreen');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -109,6 +113,14 @@ const CarsScreen = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+      
+      {/* Add New Car Button */}
+      <TouchableOpacity 
+        style={styles.addButton}
+        onPress={handleAddNewCar}
+      >
+        <Ionicons name="add" size={24} color="#000000" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -248,6 +260,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#000000',
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FFD600',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
 });
 
