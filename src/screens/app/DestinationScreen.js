@@ -23,7 +23,10 @@ const DestinationScreen = ({ navigation, route }) => {
     passengerName: 'Esther Howard',
     paymentMethod: 'Cash Payment',
     pickup: '6391 Elgin St. Celina, Delaware 10299',
-    dropoff: '1901 Thornridge Cir. Shiloh Hawaii 81063'
+    dropoff: '1901 Thornridge Cir. Shiloh Hawaii 81063',
+    distance: '16 miles',
+    otpCode: '7854',
+    fareAmount: 12.5
   };
 
   // Handle navigation button press

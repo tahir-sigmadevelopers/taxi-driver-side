@@ -79,8 +79,13 @@ const OTPVerificationScreen = ({ navigation, route }) => {
       setIsVerifying(false);
       console.log('OTP verified successfully');
       
-      // Navigate to the destination screen to begin the ride
-      navigation.navigate('DestinationScreen', { rideDetails });
+      // If the payment method is cash, navigate to cash collection screen
+      if (rideDetails.paymentMethod && rideDetails.paymentMethod.toLowerCase().includes('cash')) {
+        navigation.navigate('CashCollectionScreen', { rideDetails });
+      } else {
+        // For other payment methods, navigate to destination screen to continue the ride
+        navigation.navigate('DestinationScreen', { rideDetails });
+      }
     }, 1500);
   };
   

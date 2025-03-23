@@ -37,6 +37,9 @@ const ArrivalScreen = ({ navigation, route }) => {
         ...rideDetails,
         passengerName: rideDetails.passengerName || 'Esther Howard',
         passengerMobile: rideDetails.passengerMobile || '+1 (555) 123-4567',
+        distance: rideDetails.distance || '16 miles',
+        otpCode: rideDetails.otpCode || '7854',
+        fareAmount: rideDetails.fareAmount || 12.5
       }
     });
   };
