@@ -15,6 +15,8 @@ import ProfileDetailsScreen from '../screens/app/ProfileDetailsScreen';
 import PreBookedRidesScreen from '../screens/app/PreBookedRidesScreen';
 import CancelRideScreen from '../screens/app/CancelRideScreen';
 import CancellationSuccessScreen from '../screens/app/CancellationSuccessScreen';
+import NotificationScreen from '../screens/app/NotificationScreen';
+import UpdateDocumentDetailsScreen from '../screens/app/UpdateDocumentDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -77,6 +79,8 @@ const AppStack = () => {
       <Stack.Screen name="PreBookedRidesScreen" component={PreBookedRidesScreen} />
       <Stack.Screen name="CancelRideScreen" component={CancelRideScreen} />
       <Stack.Screen name="CancellationSuccessScreen" component={CancellationSuccessScreen} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="UpdateDocumentDetailsScreen" component={UpdateDocumentDetailsScreen} />
       
       {/* Main tab navigator */}
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />

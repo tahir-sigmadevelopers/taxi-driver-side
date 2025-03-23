@@ -90,28 +90,18 @@ const HomeScreen = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#E6EEF5" />
       
-      <MapView style={styles.mapView}>
-        {/* Countdown timer circle */}
-        {showRideRequest && (
-          <View style={styles.countdownContainer}>
-            <View style={styles.countdownInner}>
-              <Text style={styles.countdownNumber}>{countdownSeconds}</Text>
-              <Text style={styles.countdownLabel}>Seconds</Text>
-            </View>
-          </View>
-        )}
-      </MapView>
-      
-      {/* Header */}
+      {/* Header with notification button */}
       <SafeAreaView style={styles.headerContainer}>
         <TouchableOpacity 
           style={styles.menuButton} 
           onPress={() => navigation.openDrawer()}
         >
-          <Ionicons name="menu" size={24} color="black" />
+          <View>
+            <Ionicons name="menu" size={24} color="black" />
+          </View>
         </TouchableOpacity>
         
         <View style={styles.onlineToggleContainer}>
@@ -131,7 +121,33 @@ const HomeScreen = ({ navigation, route }) => {
             />
           </TouchableOpacity>
         </View>
+        
+        {/* Notification Button */}
+        <TouchableOpacity 
+          style={styles.notificationButton}
+          onPress={() => navigation.navigate('NotificationScreen')}
+        >
+          <View>
+            <Ionicons name="notifications" size={24} color="#000000" />
+          </View>
+          {/* Notification Badge */}
+          <View style={styles.notificationBadge}>
+            <Text style={styles.notificationBadgeText}>2</Text>
+          </View>
+        </TouchableOpacity>
       </SafeAreaView>
+      
+      <MapView style={styles.mapView}>
+        {/* Countdown timer circle */}
+        {showRideRequest && (
+          <View style={styles.countdownContainer}>
+            <View style={styles.countdownInner}>
+              <Text style={styles.countdownNumber}>{countdownSeconds}</Text>
+              <Text style={styles.countdownLabel}>Seconds</Text>
+            </View>
+          </View>
+        )}
+      </MapView>
       
       {/* Stats Cards */}
       <View style={styles.statsContainer}>
@@ -202,7 +218,7 @@ const HomeScreen = ({ navigation, route }) => {
           </View>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -232,8 +248,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 10,
+    padding: 20,
+    backgroundColor: '#E6EEF5',
     zIndex: 10,
   },
   menuButton: {
@@ -252,33 +268,31 @@ const styles = StyleSheet.create({
   onlineToggleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+  },
+  onlineStatus: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000000',
+    marginRight: 10,
+  },
+  toggleButton: {
+    height: 40,
+    width: 40,
     borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  onlineStatus: {
-    marginRight: 8,
-    fontWeight: '600',
-  },
-  toggleButton: {
-    width: 40,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    paddingHorizontal: 2,
-  },
   toggleButtonActive: {
     backgroundColor: '#FFD600',
   },
   toggleButtonInactive: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#666666',
   },
   toggleCircle: {
     width: 20,
@@ -287,10 +301,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   toggleCircleRight: {
-    marginLeft: 'auto',
+    backgroundColor: '#FFFFFF',
   },
   toggleCircleLeft: {
-    marginRight: 'auto',
+    backgroundColor: '#FFFFFF',
+  },
+  notificationButton: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FFD600',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationBadgeText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#000000',
   },
   statsContainer: {
     flexDirection: 'row',

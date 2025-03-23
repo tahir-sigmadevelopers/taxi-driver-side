@@ -6,6 +6,7 @@ import AppStack from './AppStack';
 import RideInProgressScreen from '../screens/app/RideInProgressScreen';
 import CancelRideScreen from '../screens/app/CancelRideScreen';
 import CancellationSuccessScreen from '../screens/app/CancellationSuccessScreen';
+import NotificationScreen from '../screens/app/NotificationScreen';
 
 // For future auth state management
 // import auth from '../services/auth';
@@ -54,7 +55,7 @@ const Navigation = () => {
         {isAuthenticated ? (
           <>
             <RootStack.Screen name="App" component={AppStack} />
-            {/* Add RideInProgressScreen at root level for direct access */}
+            {/* Add screens at root level for direct access */}
             <RootStack.Screen 
               name="RideInProgressScreen" 
               component={RideInProgressScreen} 
@@ -66,6 +67,10 @@ const Navigation = () => {
             <RootStack.Screen 
               name="CancellationSuccessScreen" 
               component={CancellationSuccessScreen} 
+            />
+            <RootStack.Screen 
+              name="NotificationScreen" 
+              component={NotificationScreen} 
             />
           </>
         ) : (

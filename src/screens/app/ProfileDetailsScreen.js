@@ -109,7 +109,10 @@ const ProfileDetailsScreen = ({ navigation }) => {
           {/* Document Details */}
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Document Details</Text>
-            <TouchableOpacity style={styles.documentButton}>
+            <TouchableOpacity 
+              style={styles.documentButton}
+              onPress={() => navigation.navigate('UpdateDocumentDetailsScreen')}
+            >
               <Text style={styles.documentButtonText}>Update Document Details</Text>
               <Ionicons name="chevron-forward" size={24} color="#FFD600" />
             </TouchableOpacity>

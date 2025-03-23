@@ -33,7 +33,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'Notification', 
       icon: 'notifications-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Notifications pressed') 
+      onPress: () => navigation.navigate('NotificationScreen') 
     },
     { 
       id: 'rides', 
