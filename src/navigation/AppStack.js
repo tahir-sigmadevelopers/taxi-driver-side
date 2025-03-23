@@ -11,6 +11,7 @@ import AccountScreen from '../screens/app/AccountScreen';
 import RideInProgressScreen from '../screens/app/RideInProgressScreen';
 import CashCollectionScreen from '../screens/app/CashCollectionScreen';
 import RateRiderScreen from '../screens/app/RateRiderScreen';
+import ProfileDetailsScreen from '../screens/app/ProfileDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -69,6 +70,7 @@ const AppStack = () => {
       <Stack.Screen name="RideInProgressScreen" component={RideInProgressScreen} />
       <Stack.Screen name="CashCollectionScreen" component={CashCollectionScreen} />
       <Stack.Screen name="RateRiderScreen" component={RateRiderScreen} />
+      <Stack.Screen name="ProfileDetailsScreen" component={ProfileDetailsScreen} />
       
       {/* Main tab navigator */}
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />

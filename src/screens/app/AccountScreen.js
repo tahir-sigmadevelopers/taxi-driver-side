@@ -26,7 +26,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'Your Profile', 
       icon: 'person-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Your Profile pressed') 
+      onPress: () => navigation.navigate('ProfileDetailsScreen')
     },
     { 
       id: 'notifications', 
