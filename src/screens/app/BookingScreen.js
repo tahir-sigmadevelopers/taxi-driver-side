@@ -82,10 +82,9 @@ const BookingScreen = ({ navigation }) => {
     // Navigate to tracking screen
   };
 
-  // Handle cancel booking
+  // Handle cancellation of a booking
   const handleCancelBooking = (booking) => {
-    console.log('Cancel booking:', booking.id);
-    // Show cancel confirmation
+    navigation.navigate('CancelRideScreen', { booking });
   };
 
   // Render a booking card
@@ -192,26 +191,24 @@ const BookingScreen = ({ navigation }) => {
         </View>
       </View>
       
-      {/* Action Buttons */}
-      <View style={styles.buttonContainer}>
-        {activeTab === 'active' && (
-          <>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => handleCancelBooking(booking)}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.trackButton}
-              onPress={() => handleTrackRider(booking)}
-            >
-              <Text style={styles.trackButtonText}>Track Rider</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+      {/* Action Buttons for Active Bookings */}
+      {activeTab === 'active' && (
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: '#FFD600' }]}
+            onPress={() => handleTrackRider(booking)}
+          >
+            <Text style={styles.actionButtonText}>Track Rider</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: '#F6F6F6' }]}
+            onPress={() => handleCancelBooking(booking)}
+          >
+            <Text style={[styles.actionButtonText, { color: '#FF3B30' }]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       
       {/* Expand/Collapse Button */}
       <TouchableOpacity style={styles.expandButton}>
@@ -527,35 +524,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     transform: [{ rotate: '25deg' }],
   },
-  buttonContainer: {
+  actionButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
   },
-  cancelButton: {
+  actionButton: {
     flex: 1,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
     borderRadius: 25,
-    marginRight: 10,
   },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-  },
-  trackButton: {
-    flex: 1,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFD600',
-    borderRadius: 25,
-    marginLeft: 10,
-  },
-  trackButtonText: {
+  actionButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',

@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
 import RideInProgressScreen from '../screens/app/RideInProgressScreen';
+import CancelRideScreen from '../screens/app/CancelRideScreen';
+import CancellationSuccessScreen from '../screens/app/CancellationSuccessScreen';
 
 // For future auth state management
 // import auth from '../services/auth';
@@ -56,6 +58,14 @@ const Navigation = () => {
             <RootStack.Screen 
               name="RideInProgressScreen" 
               component={RideInProgressScreen} 
+            />
+            <RootStack.Screen 
+              name="CancelRideScreen" 
+              component={CancelRideScreen} 
+            />
+            <RootStack.Screen 
+              name="CancellationSuccessScreen" 
+              component={CancellationSuccessScreen} 
             />
           </>
         ) : (
