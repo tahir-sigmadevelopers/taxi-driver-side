@@ -18,6 +18,7 @@ import CancellationSuccessScreen from '../screens/app/CancellationSuccessScreen'
 import NotificationScreen from '../screens/app/NotificationScreen';
 import UpdateDocumentDetailsScreen from '../screens/app/UpdateDocumentDetailsScreen';
 import CarsScreen from '../screens/app/CarsScreen';
+import CarDocumentsScreen from '../screens/app/CarDocumentsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -83,6 +84,7 @@ const AppStack = () => {
       <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
       <Stack.Screen name="UpdateDocumentDetailsScreen" component={UpdateDocumentDetailsScreen} />
       <Stack.Screen name="CarsScreen" component={CarsScreen} />
+      <Stack.Screen name="CarDocumentsScreen" component={CarDocumentsScreen} />
       
       {/* Main tab navigator */}
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />

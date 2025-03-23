@@ -25,8 +25,8 @@ const CarsScreen = ({ navigation }) => {
   };
 
   const handleEdit = () => {
-    // Navigate to edit car screen
-    console.log('Edit car pressed');
+    // Navigate to car documents screen
+    navigation.navigate('CarDocumentsScreen');
   };
 
   const handleDelete = () => {
