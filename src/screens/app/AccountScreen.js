@@ -66,7 +66,7 @@ const AccountScreen = ({ navigation }) => {
       title: 'Settings', 
       icon: 'settings-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Settings pressed') 
+      onPress: () => navigation.navigate('SettingsScreen') 
     },
     { 
       id: 'cars', 

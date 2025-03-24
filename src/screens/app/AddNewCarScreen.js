@@ -26,7 +26,7 @@ const AddNewCarScreen = ({ navigation }) => {
 
   const handleAddCarImages = () => {
     // Navigate to add car images screen
-    console.log('Add car images pressed');
+    navigation.navigate('CarImagesScreen');
   };
 
   const handleAddNewCar = () => {
