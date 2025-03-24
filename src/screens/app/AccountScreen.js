@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -8,15 +8,27 @@ import {
   Image, 
   ScrollView, 
   StatusBar, 
-  Platform 
+  Platform,
+  Modal
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
 
 const AccountScreen = ({ navigation }) => {
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
   // Mock user data
   const user = {
     name: 'Jenny Wilson',
     profilePicture: 'https://randomuser.me/api/portraits/women/44.jpg'
+  };
+
+  const handleLogout = () => {
+    // Handle logout logic
+    console.log('User logged out');
+    setLogoutModalVisible(false);
+    // Navigate to login screen or reset navigation state
+    // For now, we'll just navigate back to simulate logout
+    navigation.navigate('Login');
   };
 
   // Menu items
@@ -68,21 +80,21 @@ const AccountScreen = ({ navigation }) => {
       title: 'Help Center', 
       icon: 'information-circle-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Help Center pressed') 
+      onPress: () => navigation.navigate('HelpCenterScreen') 
     },
     { 
       id: 'privacy', 
       title: 'Privacy Policy', 
       icon: 'document-text-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Privacy Policy pressed') 
+      onPress: () => navigation.navigate('PrivacyPolicyScreen') 
     },
     { 
       id: 'logout', 
       title: 'Logout', 
       icon: 'log-out-outline', 
       color: '#FFD600',
-      onPress: () => console.log('Logout pressed') 
+      onPress: () => setLogoutModalVisible(true) 
     },
   ];
 
@@ -135,6 +147,44 @@ const AccountScreen = ({ navigation }) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      {/* Logout Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={logoutModalVisible}
+        onRequestClose={() => setLogoutModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.handleContainer}>
+              <View style={styles.handle} />
+            </View>
+            
+            <Text style={styles.modalTitle}>Logout</Text>
+            
+            <Text style={styles.modalMessage}>
+              Are you sure you want to log out?
+            </Text>
+            
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={styles.cancelButton} 
+                onPress={() => setLogoutModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.logoutButton} 
+                onPress={handleLogout}
+              >
+                <Text style={styles.logoutButtonText}>Yes, Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -227,6 +277,78 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 16,
+    color: '#000000',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 30,
+  },
+  handleContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+  handle: {
+    width: 60,
+    height: 5,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 3,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#333333',
+    textAlign: 'center',
+    marginBottom: 30,
+    paddingHorizontal: 30,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    paddingHorizontal: 20,
+  },
+  cancelButton: {
+    flex: 1,
+    height: 55,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    marginRight: 10,
+    marginLeft: 20,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333333',
+  },
+  logoutButton: {
+    flex: 1,
+    height: 55,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFD600',
+    marginLeft: 10,
+    marginRight: 20,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
     color: '#000000',
   },
 });

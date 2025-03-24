@@ -22,6 +22,8 @@ import CarDocumentsScreen from '../screens/app/CarDocumentsScreen';
 import AddNewCarScreen from '../screens/app/AddNewCarScreen';
 import CarPUCScreen from '../screens/app/CarPUCScreen';
 import BackSideScreen from '../screens/app/BackSideScreen';
+import PrivacyPolicyScreen from '../screens/app/PrivacyPolicyScreen';
+import HelpCenterScreen from '../screens/app/HelpCenterScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -91,6 +93,8 @@ const AppStack = () => {
       <Stack.Screen name="AddNewCarScreen" component={AddNewCarScreen} />
       <Stack.Screen name="CarPUCScreen" component={CarPUCScreen} />
       <Stack.Screen name="BackSideScreen" component={BackSideScreen} />
+      <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen} />
+      <Stack.Screen name="HelpCenterScreen" component={HelpCenterScreen} />
       
       {/* Main tab navigator */}
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
