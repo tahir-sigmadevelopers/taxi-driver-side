@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { 
   View, 
   Text, 
@@ -9,12 +9,23 @@ import {
   ScrollView, 
   StatusBar, 
   Platform,
-  Modal
+  Modal,
+  Alert
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import { AuthContext } from '../../../App';
 
 const AccountScreen = ({ navigation }) => {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  
+  // Safely access the AuthContext with error handling
+  let authContext;
+  try {
+    authContext = useContext(AuthContext);
+  } catch (error) {
+    console.error('Error accessing AuthContext:', error);
+    authContext = { signOut: null };
+  }
 
   // Mock user data
   const user = {
@@ -24,11 +35,30 @@ const AccountScreen = ({ navigation }) => {
 
   const handleLogout = () => {
     // Handle logout logic
-    console.log('User logged out');
+    console.log('User logged out - handleLogout triggered');
     setLogoutModalVisible(false);
-    // Navigate to login screen or reset navigation state
-    // For now, we'll just navigate back to simulate logout
-    navigation.navigate('Login');
+    
+    try {
+      console.log('AuthContext available:', !!authContext);
+      console.log('signOut method available:', !!(authContext && authContext.signOut));
+      
+      // Use Auth Context to sign out if available
+      if (authContext && authContext.signOut) {
+        console.log('Calling authContext.signOut()');
+        authContext.signOut();
+      } else {
+        console.log('No authContext.signOut available, using navigation fallback');
+        // Fallback: Reset navigation to Auth stack
+        console.log('Navigation reset to Auth');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Auth' }],
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      Alert.alert('Logout Error', 'There was a problem logging out. Please try again.');
+    }
   };
 
   // Menu items

@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, SafeAreaView, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  Platform,
+  StatusBar,
+  ActivityIndicator
+} from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import { AuthContext } from '../../../App';
 
 const LoginScreen = ({ navigation }) => {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Safely access the AuthContext with error handling
+  let authContext;
+  try {
+    authContext = useContext(AuthContext);
+  } catch (error) {
+    console.error('Error accessing AuthContext:', error);
+    authContext = { signIn: null };
+  }
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -19,18 +40,17 @@ const LoginScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Placeholder for actual API login
-      // Replace with your authentication logic
-      
-      // Simulating successful login
-      await AsyncStorage.setItem('userToken', 'driver-token-123');
-      
-      // Reset navigation stack and go to main app
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Main' }],
-      });
+      // Use auth context to sign in if available
+      if (authContext && authContext.signIn) {
+        console.log('Using AuthContext.signIn');
+        authContext.signIn();
+      } else {
+        console.log('No AuthContext.signIn available');
+        // Fallback if context isn't available
+        Alert.alert('Error', 'Authentication service not available');
+      }
     } catch (error) {
+      console.error('Login error:', error);
       Alert.alert('Login Failed', error.message || 'Something went wrong');
     } finally {
       setIsLoading(false);
@@ -39,58 +59,62 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
-          <Text style={styles.title}>Sign In</Text>
-          <Text style={styles.subtitle}>Hi! Welcome back, you've been missed</Text>
+          <Image 
+            source={require('../../assets/logo.png')} 
+            style={styles.logo} 
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>Welcome Back!</Text>
+          <Text style={styles.subtitle}>Sign in to continue</Text>
         </View>
-
-        <View style={styles.form}>
+        
+        <View style={styles.formContainer}>
+          {/* Email Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Name</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Esther Howard"
-              value={name}
-              onChangeText={setName}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="example@gmail.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <View style={styles.passwordContainer}>
+            <Text style={styles.inputLabel}>Email</Text>
+            <View style={styles.inputWrapper}>
               <TextInput
-                style={styles.passwordInput}
-                placeholder="****************"
-                secureTextEntry={!isPasswordVisible}
+                style={styles.input}
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+          </View>
+          
+          {/* Password Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Password</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your password"
                 value={password}
                 onChangeText={setPassword}
+                secureTextEntry={!isPasswordVisible}
               />
               <TouchableOpacity 
-                style={styles.eyeIcon} 
+                style={styles.visibilityIcon}
                 onPress={() => setIsPasswordVisible(!isPasswordVisible)}
               >
                 <Ionicons 
                   name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'} 
                   size={24} 
-                  color="#888"
+                  color="#CCCCCC" 
                 />
               </TouchableOpacity>
             </View>
           </View>
-
+          
           <TouchableOpacity style={styles.forgotPassword} onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
@@ -100,7 +124,11 @@ const LoginScreen = ({ navigation }) => {
             onPress={handleLogin}
             disabled={isLoading}
           >
-            <Text style={styles.buttonText}>Sign In</Text>
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.buttonText}>Sign In</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -111,26 +139,15 @@ const LoginScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.socialContainer}>
+          {/* Replace with actual logo assets */}
           <TouchableOpacity style={styles.socialButton}>
-            <Image 
-              source={require('../../assets/apple.png')} 
-              style={styles.socialIcon} 
-              resizeMode="contain"
-            />
+            <Ionicons name="logo-apple" size={24} color="#000000" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.socialButton}>
-            <Image 
-              source={require('../../assets/google.png')} 
-              style={styles.socialIcon} 
-              resizeMode="contain"
-            />
+            <Ionicons name="logo-google" size={24} color="#DB4437" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.socialButton}>
-            <Image 
-              source={require('../../assets/facebook.png')} 
-              style={styles.socialIcon} 
-              resizeMode="contain"
-            />
+            <Ionicons name="logo-facebook" size={24} color="#3b5998" />
           </TouchableOpacity>
         </View>
 
@@ -150,97 +167,99 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  scrollContainer: {
+  scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 10,
+    paddingBottom: 30,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
+    marginTop: 30,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 8,
+    color: '#000000',
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: '#666666',
   },
-  form: {
+  formContainer: {
     marginBottom: 30,
   },
   inputContainer: {
     marginBottom: 20,
   },
-  label: {
+  inputLabel: {
     fontSize: 16,
-    color: '#000',
+    fontWeight: '600',
+    color: '#333333',
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-  },
-  passwordContainer: {
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
+    borderColor: '#DDDDDD',
+    borderRadius: 10,
+    height: 55,
+    paddingHorizontal: 15,
   },
-  passwordInput: {
+  input: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     fontSize: 16,
+    color: '#333333',
   },
-  eyeIcon: {
-    padding: 10,
+  visibilityIcon: {
+    padding: 5,
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: 24,
+    marginBottom: 25,
   },
   forgotPasswordText: {
-    color: '#FFD600',
     fontSize: 14,
-    fontWeight: 'bold',
+    color: '#FFD600',
+    fontWeight: '600',
   },
   button: {
+    height: 55,
     backgroundColor: '#FFD600',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 30,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   buttonDisabled: {
     opacity: 0.7,
   },
   buttonText: {
-    color: '#000',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#000000',
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    marginBottom: 25,
   },
   divider: {
     flex: 1,
     height: 1,
-    backgroundColor: '#DDDDDD',
+    backgroundColor: '#EEEEEE',
   },
   dividerText: {
-    paddingHorizontal: 16,
-    color: '#666',
+    marginHorizontal: 15,
+    fontSize: 14,
+    color: '#666666',
   },
   socialContainer: {
     flexDirection: 'row',
@@ -248,14 +267,13 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   socialButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 12,
+    marginHorizontal: 10,
   },
   socialIcon: {
     width: 24,
@@ -264,17 +282,19 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 30,
   },
   footerText: {
-    color: '#666',
     fontSize: 14,
+    color: '#666666',
   },
   footerLink: {
-    color: '#FFD600',
     fontSize: 14,
-    fontWeight: 'bold',
+    color: '#FFD600',
+    fontWeight: '600',
   },
+  ActivityIndicator: {
+    color: '#FFFFFF',
+  }
 });
 
 export default LoginScreen; 
