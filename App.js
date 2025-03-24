@@ -29,7 +29,7 @@ export const AuthContext = React.createContext({
 
 // Mock authentication service
 export const authService = {
-  isAuthenticated: false, // Initially show Auth stack
+  isAuthenticated: true, // Set to true to initially show Main stack instead of Auth
   login: (callback) => {
     authService.isAuthenticated = true;
     callback && callback();
@@ -44,7 +44,7 @@ const RootStack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Set to true for immediate Main screens access
   
   useEffect(() => {
     // Check if user is authenticated
@@ -53,7 +53,7 @@ export default function App() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Set initial auth state based on authService
-      setIsAuthenticated(authService.isAuthenticated);
+      setIsAuthenticated(true); // Always set to true to force Main screens to show
       setIsLoading(false);
     };
 
