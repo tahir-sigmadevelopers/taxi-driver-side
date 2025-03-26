@@ -44,7 +44,7 @@ const RootStack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Set to true for immediate Main screens access
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Set to false to show Auth screens first
   
   useEffect(() => {
     // Check if user is authenticated
@@ -53,7 +53,7 @@ export default function App() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Set initial auth state based on authService
-      setIsAuthenticated(true); // Always set to true to force Main screens to show
+      setIsAuthenticated(false); // Set to false to require login
       setIsLoading(false);
     };
 

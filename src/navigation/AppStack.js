@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from 'react-native-vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import screens
 import HomeScreen from '../screens/app/HomeScreen';
@@ -32,7 +33,10 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Main tab navigator
-const MainTabNavigator = () => {
+const MainTabNavigator = ({ route }) => {
+  // Get locationPermissionGranted from route params
+  const locationPermissionGranted = route?.params?.locationPermissionGranted === true;
+  
   return (
     <Tab.Navigator
       key="MainTabNavigator"
@@ -64,16 +68,58 @@ const MainTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Booking" component={BookingScreen} />
-      <Tab.Screen name="Earnings" component={EarningsScreen} />
-      <Tab.Screen name="Account" component={AccountScreen} />
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen}
+        initialParams={{ locationPermissionGranted }} 
+      />
+      <Tab.Screen 
+        name="Booking" 
+        component={BookingScreen}
+        initialParams={{ locationPermissionGranted }} 
+      />
+      <Tab.Screen 
+        name="Earnings" 
+        component={EarningsScreen}
+        initialParams={{ locationPermissionGranted }} 
+      />
+      <Tab.Screen 
+        name="Account" 
+        component={AccountScreen}
+        initialParams={{ locationPermissionGranted }} 
+      />
     </Tab.Navigator>
   );
 };
 
 // App stack navigator with screens that are above the tab navigator
-const AppStack = () => {
+const AppStack = ({ route }) => {
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Load location permission status from AsyncStorage
+    const loadLocationPermission = async () => {
+      try {
+        const savedPermission = await AsyncStorage.getItem('locationPermissionGranted');
+        if (savedPermission !== null) {
+          setLocationPermissionGranted(JSON.parse(savedPermission));
+        }
+      } catch (error) {
+        console.error('Error loading location permission status:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadLocationPermission();
+  }, []);
+  
+  // If still loading, return null or loading screen
+  if (isLoading) {
+    return null;
+  }
+  
   return (
     <Stack.Navigator
       initialRouteName="MainTabs"
@@ -103,7 +149,11 @@ const AppStack = () => {
       <Stack.Screen name="ImageUploadScreen" component={ImageUploadScreen} />
       
       {/* Main tab navigator */}
-      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen 
+        name="MainTabs" 
+        component={MainTabNavigator}
+        initialParams={{ locationPermissionGranted }}
+      />
     </Stack.Navigator>
   );
 };

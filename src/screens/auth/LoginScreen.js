@@ -40,15 +40,16 @@ const LoginScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Use auth context to sign in if available
-      if (authContext && authContext.signIn) {
-        console.log('Using AuthContext.signIn');
-        authContext.signIn();
-      } else {
-        console.log('No AuthContext.signIn available');
-        // Fallback if context isn't available
-        Alert.alert('Error', 'Authentication service not available');
-      }
+      // Simulate authentication delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // In a real app, you would verify credentials with a backend service
+      // For demo purposes, we'll just navigate to the location permission screen
+      
+      // Navigate to location permission screen with user data
+      navigation.navigate('LocationPermission', { 
+        email: email
+      });
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Login Failed', error.message || 'Something went wrong');

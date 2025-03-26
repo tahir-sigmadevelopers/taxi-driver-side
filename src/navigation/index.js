@@ -27,7 +27,7 @@ const Navigation = () => {
       try {
         // const user = await auth.getCurrentUser();
         // setIsAuthenticated(!!user);
-        setIsAuthenticated(true); // Set to true for testing
+        setIsAuthenticated(false); // Set to false to start with login screen
       } catch (error) {
         console.error('Authentication error:', error);
         setIsAuthenticated(false);

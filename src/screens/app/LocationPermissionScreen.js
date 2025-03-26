@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -14,10 +14,18 @@ import {
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
 import * as Location from 'expo-location';
+import { AuthContext } from '../../../App';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LocationPermissionScreen = ({ navigation }) => {
+const LocationPermissionScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState(null);
+  
+  // Access AuthContext
+  const authContext = useContext(AuthContext);
+  
+  // Extract params
+  const email = route.params?.email || 'User';
 
   // Check current permission status on component mount
   useEffect(() => {
@@ -96,14 +104,33 @@ const LocationPermissionScreen = ({ navigation }) => {
   };
 
   // Navigate to main app
-  const handleContinueToApp = (locationPermissionGranted = false) => {
-    navigation.reset({
-      index: 0,
-      routes: [{ 
-        name: 'Main',
-        params: { locationPermissionGranted }
-      }]
-    });
+  const handleContinueToApp = async (locationPermissionGranted = false) => {
+    console.log('Continuing to main app with location permission:', locationPermissionGranted);
+    
+    try {
+      // Store location permission status in AsyncStorage for use throughout the app
+      await AsyncStorage.setItem('locationPermissionGranted', JSON.stringify(locationPermissionGranted));
+      
+      // Use the AuthContext to sign in directly
+      if (authContext && authContext.signIn) {
+        console.log('Signing in via AuthContext...');
+        authContext.signIn();
+      } else {
+        console.error('AuthContext not available');
+        Alert.alert(
+          "Error",
+          "Unable to continue to the main app. Please restart the application.",
+          [{ text: "OK" }]
+        );
+      }
+    } catch (error) {
+      console.error('Error saving permission status:', error);
+      
+      // Continue anyway
+      if (authContext && authContext.signIn) {
+        authContext.signIn();
+      }
+    }
   };
 
   // Handle "Maybe Later" option
