@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "712561930588",
+    "project_id": "react-native-with-db",
+    "storage_bucket": "react-native-with-db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712561930588:android:bd60697ed01b5243eb9199",
+        "android_client_info": {
+          "package_name": "com.driverside.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB8fbEf54LvBdFeN4RVP-0YjU1-E8k2lQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712561930588:android:ee6e3ddbfb9b4e6ceb9199",
+        "android_client_info": {
+          "package_name": "com.ridewave.user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB8fbEf54LvBdFeN4RVP-0YjU1-E8k2lQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

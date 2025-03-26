@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ridewave.driver",
+      "bundleIdentifier": "com.driverside.myapp",
       "config": {
         "googleMapsApiKey": "AlzaSys8SiMctQ5kBREAf8BkaR-BQNwq5GY3TEf"
       }
@@ -27,7 +27,7 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ridewave.driver",
+      "package": "com.driverside.myapp",
       "config": {
         "googleMaps": {
           "apiKey": "AlzaSys8SiMctQ5kBREAf8BkaR-BQNwq5GY3TEf"
@@ -53,10 +53,11 @@
       ],
       "@react-native-firebase/app"
     ],
+    "owner": "tahirbhai",
     "extra": {
       "eas": {
-        "projectId": "d278cb03-ef2b-4caa-a6d5-6534eafbdd7d"
+        "projectId": "e21660fe-4967-4d76-9921-a88da7315b7b"
       }
     }
   }
-} 
+}
