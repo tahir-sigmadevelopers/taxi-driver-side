@@ -8,9 +8,12 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
-  Image
+  Image,
+  Alert,
+  Platform
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const DrivingDetailsScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -31,16 +34,107 @@ const DrivingDetailsScreen = ({ navigation }) => {
     }));
   };
 
-  const handleTakePhoto = () => {
-    // In a real app, this would use the camera API
-    console.log('Take photo pressed');
+  const handleTakePhoto = async () => {
+    // Request camera permission
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your camera to take a photo of your license.");
+      return;
+    }
+
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.8,
+      aspect: [4, 3]
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setLicensePhoto({
+        uri: uri,
+        name: 'Drivers License',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
   };
 
-  const handleUploadPhoto = () => {
-    // In a real app, this would use the image picker API
-    console.log('Upload photo pressed');
-    // For demo purposes
-    setLicensePhoto('https://example.com/license_photo.jpg');
+  const handleUploadPhoto = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your photos to upload your license photo.");
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+      aspect: [4, 3]
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      const fileNameMatch = uri.match(/[^\\/]+$/);
+      const fileName = fileNameMatch ? fileNameMatch[0] : 'license_photo.jpg';
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setLicensePhoto({
+        uri: uri,
+        name: 'Drivers License',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
+  };
+
+  // Get file information (size)
+  const getFileInfo = async (uri) => {
+    if (Platform.OS === 'web') {
+      return { size: 0 }; // Web doesn't provide file size
+    }
+    
+    try {
+      const fileInfo = await fetch(uri).then(response => {
+        return {
+          size: response.headers.get('Content-Length') || 0
+        };
+      });
+      return fileInfo;
+    } catch (error) {
+      console.error('Error getting file info:', error);
+      return { size: 0 };
+    }
+  };
+
+  // Get file extension from URI
+  const getFileType = (uri) => {
+    const extension = uri.split('.').pop().toUpperCase();
+    return extension || 'JPG';
+  };
+
+  // Format file size for display
+  const formatFileSize = (size) => {
+    if (size < 1024) {
+      return size + ' B';
+    } else if (size < 1024 * 1024) {
+      return (size / 1024).toFixed(2) + ' KB';
+    } else {
+      return (size / (1024 * 1024)).toFixed(2) + ' MB';
+    }
   };
 
   const isFormValid = () => {
@@ -57,7 +151,7 @@ const DrivingDetailsScreen = ({ navigation }) => {
 
   const handleSave = async () => {
     if (!isFormValid()) {
-      alert('Please fill in all fields and upload your license photo');
+      Alert.alert('Missing Information', 'Please fill in all fields and upload your license photo');
       return;
     }
 
@@ -66,8 +160,26 @@ const DrivingDetailsScreen = ({ navigation }) => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // In a real app, you would upload the form data and photo
+      // Example:
+      // const formDataToSend = new FormData();
+      // Object.keys(formData).forEach(key => {
+      //   formDataToSend.append(key, formData[key]);
+      // });
+      // formDataToSend.append('licensePhoto', {
+      //   uri: licensePhoto.uri,
+      //   name: 'license_photo.jpg',
+      //   type: 'image/jpeg'
+      // });
+      // await fetch('https://your-api.com/upload-driving-details', {
+      //   method: 'POST',
+      //   body: formDataToSend
+      // });
+      
       // Navigate back to Welcome screen
       navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save driving details. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -162,7 +274,7 @@ const DrivingDetailsScreen = ({ navigation }) => {
           {licensePhoto ? (
             <View style={styles.photoPreview}>
               <Image 
-                source={{ uri: licensePhoto }} 
+                source={{ uri: licensePhoto.uri }} 
                 style={styles.licenseImage} 
                 resizeMode="cover"
               />
@@ -170,8 +282,13 @@ const DrivingDetailsScreen = ({ navigation }) => {
                 style={styles.removePhotoButton}
                 onPress={() => setLicensePhoto(null)}
               >
-                <Ionicons name="close-circle" size={24} color="red" />
+                <Ionicons name="close-circle" size={24} color="#FF3B30" />
               </TouchableOpacity>
+              
+              <View style={styles.photoInfo}>
+                <Text style={styles.photoInfoName}>{licensePhoto.name}</Text>
+                <Text style={styles.photoInfoDetails}>{licensePhoto.type} • {licensePhoto.size}</Text>
+              </View>
             </View>
           ) : (
             <View style={styles.photoActions}>
@@ -249,32 +366,32 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    marginTop: 24,
+    marginBottom: 16,
     color: '#000',
-    marginTop: 10,
-    marginBottom: 20,
   },
   formGroup: {
     marginBottom: 20,
   },
   formRow: {
     flexDirection: 'row',
-    marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    color: '#333',
     marginBottom: 8,
+    color: '#333',
   },
   input: {
     borderWidth: 1,
     borderColor: '#DDDDDD',
-    borderRadius: 10,
-    padding: 15,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     fontSize: 16,
   },
   photoActions: {
@@ -283,64 +400,75 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    padding: 15,
+    flexDirection: 'row',
     alignItems: 'center',
-    margin: 5,
+    justifyContent: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    padding: 15,
+    marginHorizontal: 5,
   },
   photoButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
     color: '#000',
-    marginTop: 8,
-    fontSize: 14,
   },
   photoPreview: {
     position: 'relative',
-    alignItems: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   licenseImage: {
     width: '100%',
     height: 200,
-    borderRadius: 10,
-    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
   },
   removePhotoButton: {
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: 'white',
-    borderRadius: 15,
-    elevation: 2,
+  },
+  photoInfo: {
+    marginTop: 8,
+  },
+  photoInfoName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  photoInfoDetails: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 4,
   },
   noteContainer: {
     flexDirection: 'row',
     backgroundColor: '#F5F5F5',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    marginBottom: 30,
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 20,
   },
   noteText: {
+    flex: 1,
+    marginLeft: 8,
     fontSize: 14,
     color: '#666',
-    marginLeft: 10,
-    flex: 1,
   },
   saveButton: {
     backgroundColor: '#FFD600',
-    borderRadius: 30,
-    margin: 20,
-    paddingVertical: 15,
+    borderRadius: 12,
+    height: 56,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#F5F5F5',
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   saveButtonText: {
-    color: '#000',
+    color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
 

@@ -230,7 +230,7 @@ const CompleteProfileScreen = ({ navigation, route }) => {
   const [gender, setGender] = useState('');
   const [showGenderDropdown, setShowGenderDropdown] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
-
+  
   // Modal states
   const [genderModalVisible, setGenderModalVisible] = useState(false);
 
@@ -447,31 +447,31 @@ const CompleteProfileScreen = ({ navigation, route }) => {
               <TouchableOpacity onPress={() => navigation.navigate('Terms')}>
                 <Text style={styles.termsLink}>Terms & Condition</Text>
               </TouchableOpacity>
-            </View>
+          </View>
 
-            <TouchableOpacity
-              style={[styles.continueButton, loading && styles.disabledButton]}
-              onPress={handleContinue}
-              disabled={loading}
-            >
-              {loading ? (
+          <TouchableOpacity
+            style={[styles.continueButton, loading && styles.disabledButton]}
+            onPress={handleContinue}
+            disabled={loading}
+          >
+            {loading ? (
                 <ActivityIndicator size="small" color="#000" />
-              ) : (
-                <Text style={styles.continueButtonText}>Continue</Text>
-              )}
-            </TouchableOpacity>
+            ) : (
+              <Text style={styles.continueButtonText}>Continue</Text>
+            )}
+          </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Gender Selection Modal */}
-      <SelectionModal
-        visible={genderModalVisible}
-        onClose={() => setGenderModalVisible(false)}
-        data={GENDER_OPTIONS}
-        onSelect={handleSelectGender}
-        title="Select Gender"
-      />
+        {/* Gender Selection Modal */}
+        <SelectionModal
+          visible={genderModalVisible}
+          onClose={() => setGenderModalVisible(false)}
+          data={GENDER_OPTIONS}
+          onSelect={handleSelectGender}
+          title="Select Gender"
+        />
 
       {/* Country Code Selection Modal */}
       <SelectionModal
@@ -495,13 +495,13 @@ const CompleteProfileScreen = ({ navigation, route }) => {
         )}
       />
 
-      {/* City Selection Modal */}
-      <SelectionModal
+        {/* City Selection Modal */}
+        <SelectionModal
         visible={isCityModalVisible}
-        onClose={() => setCityModalVisible(false)}
+          onClose={() => setCityModalVisible(false)}
         data={filteredCities}
         onSelect={handleCitySelect}
-        title="Select City"
+          title="Select City"
         searchable={true}
         searchText={citySearchText}
         onSearchChange={setCitySearchText}

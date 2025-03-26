@@ -6,23 +6,120 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert,
+  Platform
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const ProfilePictureScreen = ({ navigation }) => {
-  const [image, setImage] = useState({
-    uri: 'https://example.com/profile.jpg',
-    name: 'Profile',
-    type: 'JPG',
-    size: '250 kb'
-  });
+  const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleDocumentUpload = () => {
-    // In a real app, this would use the document picker API
-    console.log('Document upload pressed');
-    // Mock implementation already set the image in state
+  // Request permissions and pick image
+  const handleDocumentUpload = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your photos to upload a profile picture.");
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      const fileNameMatch = uri.match(/[^\\/]+$/);
+      const fileName = fileNameMatch ? fileNameMatch[0] : 'profile_image.jpg';
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setImage({
+        uri: uri,
+        name: 'Profile Photo',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
+  };
+
+  // Take a picture with camera
+  const handleTakePhoto = async () => {
+    // Request camera permission
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your camera to take a profile photo.");
+      return;
+    }
+
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setImage({
+        uri: uri,
+        name: 'Profile Photo',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
+  };
+
+  // Get file information (size)
+  const getFileInfo = async (uri) => {
+    if (Platform.OS === 'web') {
+      return { size: 0 }; // Web doesn't provide file size
+    }
+    
+    try {
+      const fileInfo = await fetch(uri).then(response => {
+        return {
+          size: response.headers.get('Content-Length') || 0
+        };
+      });
+      return fileInfo;
+    } catch (error) {
+      console.error('Error getting file info:', error);
+      return { size: 0 };
+    }
+  };
+
+  // Get file extension from URI
+  const getFileType = (uri) => {
+    const extension = uri.split('.').pop().toUpperCase();
+    return extension || 'JPG';
+  };
+
+  // Format file size for display
+  const formatFileSize = (size) => {
+    if (size < 1024) {
+      return size + ' B';
+    } else if (size < 1024 * 1024) {
+      return (size / 1024).toFixed(2) + ' KB';
+    } else {
+      return (size / (1024 * 1024)).toFixed(2) + ' MB';
+    }
   };
 
   const handleRemoveImage = () => {
@@ -31,18 +128,32 @@ const ProfilePictureScreen = ({ navigation }) => {
 
   const handleContinue = async () => {
     if (!image) {
-      // In a real app, we'd show a proper error message
-      alert('Please upload a photo first');
+      Alert.alert('Missing Photo', 'Please upload a profile photo first');
       return;
     }
 
     setLoading(true);
     try {
-      // Simulate API call
+      // Simulate API call for uploading the image
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // In a real app, you would upload the image to a server
+      // Example:
+      // const formData = new FormData();
+      // formData.append('profileImage', {
+      //   uri: image.uri,
+      //   name: 'profile.jpg',
+      //   type: 'image/jpeg'
+      // });
+      // await fetch('https://your-api.com/upload', {
+      //   method: 'POST',
+      //   body: formData
+      // });
       
       // Navigate back to Welcome screen
       navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to upload profile picture. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -82,7 +193,7 @@ const ProfilePictureScreen = ({ navigation }) => {
             <View style={styles.bulletIcon}>
               <Ionicons name="checkmark" size={16} color="#FFFFFF" />
             </View>
-            <Text style={styles.bulletText}>Upload PDF / JPEG / PNG</Text>
+            <Text style={styles.bulletText}>Upload JPEG / PNG format image</Text>
           </View>
         </View>
 
@@ -91,22 +202,33 @@ const ProfilePictureScreen = ({ navigation }) => {
         <Text style={styles.sectionTitle}>Attach Picture</Text>
 
         {!image ? (
-          <TouchableOpacity 
-            style={styles.uploadContainer}
-            onPress={handleDocumentUpload}
-          >
-            <View style={styles.uploadIconContainer}>
-              <Ionicons name="document-outline" size={40} color="#888" />
-              <Ionicons name="arrow-up" size={20} color="#888" style={styles.uploadArrow} />
-            </View>
-            <Text style={styles.uploadText}>Upload Documents</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity 
+              style={styles.uploadContainer}
+              onPress={handleDocumentUpload}
+            >
+              <View style={styles.uploadIconContainer}>
+                <Ionicons name="image-outline" size={40} color="#888" />
+                <Ionicons name="arrow-up" size={20} color="#888" style={styles.uploadArrow} />
+              </View>
+              <Text style={styles.uploadText}>Choose from gallery</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.cameraButton}
+              onPress={handleTakePhoto}
+            >
+              <Ionicons name="camera-outline" size={24} color="#000" />
+              <Text style={styles.cameraButtonText}>Take a photo</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <View>
             <View style={styles.documentContainer}>
               <Image 
                 source={{ uri: image.uri }} 
-                style={styles.documentImage} 
+                style={styles.documentImage}
+                resizeMode="cover" 
               />
               <TouchableOpacity 
                 style={styles.removeDocumentButton}
@@ -208,10 +330,10 @@ const styles = StyleSheet.create({
     borderColor: '#DDDDDD',
     borderStyle: 'dashed',
     borderRadius: 12,
-    height: 250,
+    height: 200,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 16,
   },
   uploadIconContainer: {
     position: 'relative',
@@ -226,13 +348,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888',
   },
+  cameraButton: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  cameraButtonText: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 8,
+  },
   documentContainer: {
     position: 'relative',
     marginBottom: 15,
   },
   documentImage: {
     width: '100%',
-    height: 200,
+    height: 300,
     borderRadius: 12,
   },
   removeDocumentButton: {
@@ -257,22 +393,24 @@ const styles = StyleSheet.create({
   documentType: {
     fontSize: 14,
     color: '#888',
-    marginTop: 5,
+    marginTop: 4,
   },
   continueButton: {
     backgroundColor: '#FFD600',
-    borderRadius: 30,
-    margin: 20,
-    paddingVertical: 15,
+    borderRadius: 12,
+    height: 56,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#F5F5F5',
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   continueButtonText: {
-    color: '#000',
+    color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
 

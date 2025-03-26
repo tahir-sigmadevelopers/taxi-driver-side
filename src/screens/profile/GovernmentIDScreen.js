@@ -7,42 +7,234 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Image
+  Image,
+  Alert,
+  Platform
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const GovernmentIDScreen = ({ navigation }) => {
-  const [document, setDocument] = useState({
-    uri: 'https://example.com/profile.jpg',
-    name: 'GOV ID',
-    type: 'JPG',
-    size: '250 kb'
-  });
+  const [frontDocument, setFrontDocument] = useState(null);
+  const [backDocument, setBackDocument] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleDocumentUpload = () => {
-    // In a real app, this would use the document picker API
-    console.log('Document upload pressed');
-    // Mock implementation already set the document in state
+  // Request permissions and pick front document/image
+  const handleFrontDocumentUpload = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your photos to upload government ID.");
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      const fileNameMatch = uri.match(/[^\\/]+$/);
+      const fileName = fileNameMatch ? fileNameMatch[0] : 'gov_id_front.jpg';
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setFrontDocument({
+        uri: uri,
+        name: 'ID Front Side',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
   };
 
-  const handleRemoveDocument = () => {
-    setDocument(null);
+  // Request permissions and pick back document/image
+  const handleBackDocumentUpload = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your photos to upload government ID.");
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      const fileNameMatch = uri.match(/[^\\/]+$/);
+      const fileName = fileNameMatch ? fileNameMatch[0] : 'gov_id_back.jpg';
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setBackDocument({
+        uri: uri,
+        name: 'ID Back Side',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
+  };
+
+  // Take a picture of front side with camera
+  const handleTakeFrontPhoto = async () => {
+    // Request camera permission
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your camera to capture your ID.");
+      return;
+    }
+
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setFrontDocument({
+        uri: uri,
+        name: 'ID Front Side',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
+  };
+
+  // Take a picture of back side with camera
+  const handleTakeBackPhoto = async () => {
+    // Request camera permission
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to allow access to your camera to capture your ID.");
+      return;
+    }
+
+    // Launch camera
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      // Get file info
+      const uri = result.assets[0].uri;
+      
+      // Get file size
+      const fileInfo = await getFileInfo(uri);
+      
+      setBackDocument({
+        uri: uri,
+        name: 'ID Back Side',
+        type: getFileType(uri),
+        size: formatFileSize(fileInfo.size)
+      });
+    }
+  };
+
+  // Get file information (size)
+  const getFileInfo = async (uri) => {
+    if (Platform.OS === 'web') {
+      return { size: 0 }; // Web doesn't provide file size
+    }
+    
+    try {
+      const fileInfo = await fetch(uri).then(response => {
+        return {
+          size: response.headers.get('Content-Length') || 0
+        };
+      });
+      return fileInfo;
+    } catch (error) {
+      console.error('Error getting file info:', error);
+      return { size: 0 };
+    }
+  };
+
+  // Get file extension from URI
+  const getFileType = (uri) => {
+    const extension = uri.split('.').pop().toUpperCase();
+    return extension || 'JPG';
+  };
+
+  // Format file size for display
+  const formatFileSize = (size) => {
+    if (size < 1024) {
+      return size + ' B';
+    } else if (size < 1024 * 1024) {
+      return (size / 1024).toFixed(2) + ' KB';
+    } else {
+      return (size / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+  };
+
+  const handleRemoveFrontDocument = () => {
+    setFrontDocument(null);
+  };
+
+  const handleRemoveBackDocument = () => {
+    setBackDocument(null);
   };
 
   const handleContinue = async () => {
-    if (!document) {
-      alert('Please upload a government ID document first');
+    if (!frontDocument) {
+      Alert.alert('Missing Document', 'Please upload the front side of your government ID.');
+      return;
+    }
+
+    if (!backDocument) {
+      Alert.alert('Missing Document', 'Please upload the back side of your government ID.');
       return;
     }
 
     setLoading(true);
     try {
-      // Simulate API call
+      // Simulate API call for uploading the documents
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // In a real app, you would upload the documents to a server
+      // Example:
+      // const formData = new FormData();
+      // formData.append('frontDocument', {
+      //   uri: frontDocument.uri,
+      //   name: 'gov_id_front.jpg',
+      //   type: 'image/jpeg'
+      // });
+      // formData.append('backDocument', {
+      //   uri: backDocument.uri,
+      //   name: 'gov_id_back.jpg',
+      //   type: 'image/jpeg'
+      // });
+      // await fetch('https://your-api.com/upload-government-id', {
+      //   method: 'POST',
+      //   body: formData
+      // });
       
       // Navigate back to Welcome screen
       navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to upload government ID. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -82,51 +274,109 @@ const GovernmentIDScreen = ({ navigation }) => {
             <View style={styles.bulletIcon}>
               <Ionicons name="checkmark" size={16} color="#FFFFFF" />
             </View>
-            <Text style={styles.bulletText}>Only documents that are less than 10 MB in size and in JPG, JPEG, PNG, or pdf format will be accepted.</Text>
+            <Text style={styles.bulletText}>Only documents that are less than 10 MB in size and in JPG, JPEG, PNG format will be accepted.</Text>
           </View>
         </View>
 
         <View style={styles.divider} />
 
-        <Text style={styles.sectionTitle}>Profile Picture</Text>
+        {/* Front Side */}
+        <Text style={styles.sectionTitle}>ID Front Side</Text>
 
-        {!document ? (
-          <TouchableOpacity 
-            style={styles.uploadContainer}
-            onPress={handleDocumentUpload}
-          >
-            <View style={styles.uploadIconContainer}>
-              <Ionicons name="document-outline" size={40} color="#888" />
-              <Ionicons name="arrow-up" size={20} color="#888" style={styles.uploadArrow} />
-            </View>
-            <Text style={styles.uploadText}>Upload Documents</Text>
-          </TouchableOpacity>
+        {!frontDocument ? (
+          <View>
+            <TouchableOpacity 
+              style={styles.uploadContainer}
+              onPress={handleFrontDocumentUpload}
+            >
+              <View style={styles.uploadIconContainer}>
+                <Ionicons name="card-outline" size={40} color="#888" />
+                <Ionicons name="arrow-up" size={20} color="#888" style={styles.uploadArrow} />
+              </View>
+              <Text style={styles.uploadText}>Upload Front Side</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.cameraButton}
+              onPress={handleTakeFrontPhoto}
+            >
+              <Ionicons name="camera-outline" size={24} color="#000" />
+              <Text style={styles.cameraButtonText}>Take a photo of Front Side</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <View>
             <View style={styles.documentContainer}>
               <Image 
-                source={{ uri: document.uri }} 
+                source={{ uri: frontDocument.uri }} 
                 style={styles.documentImage} 
+                resizeMode="cover"
               />
               <TouchableOpacity 
                 style={styles.removeDocumentButton}
-                onPress={handleRemoveDocument}
+                onPress={handleRemoveFrontDocument}
               >
                 <Ionicons name="close" size={16} color="#000" />
               </TouchableOpacity>
             </View>
             <View style={styles.documentInfo}>
-              <Text style={styles.documentName}>{document.name}</Text>
-              <Text style={styles.documentType}>{document.type} • {document.size}</Text>
+              <Text style={styles.documentName}>{frontDocument.name}</Text>
+              <Text style={styles.documentType}>{frontDocument.type} • {frontDocument.size}</Text>
+            </View>
+          </View>
+        )}
+
+        {/* Back Side */}
+        <Text style={styles.sectionTitle}>ID Back Side</Text>
+
+        {!backDocument ? (
+          <View>
+            <TouchableOpacity 
+              style={styles.uploadContainer}
+              onPress={handleBackDocumentUpload}
+            >
+              <View style={styles.uploadIconContainer}>
+                <Ionicons name="card-outline" size={40} color="#888" />
+                <Ionicons name="arrow-up" size={20} color="#888" style={styles.uploadArrow} />
+              </View>
+              <Text style={styles.uploadText}>Upload Back Side</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.cameraButton}
+              onPress={handleTakeBackPhoto}
+            >
+              <Ionicons name="camera-outline" size={24} color="#000" />
+              <Text style={styles.cameraButtonText}>Take a photo of Back Side</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View>
+            <View style={styles.documentContainer}>
+              <Image 
+                source={{ uri: backDocument.uri }} 
+                style={styles.documentImage}
+                resizeMode="cover" 
+              />
+              <TouchableOpacity 
+                style={styles.removeDocumentButton}
+                onPress={handleRemoveBackDocument}
+              >
+                <Ionicons name="close" size={16} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.documentInfo}>
+              <Text style={styles.documentName}>{backDocument.name}</Text>
+              <Text style={styles.documentType}>{backDocument.type} • {backDocument.size}</Text>
             </View>
           </View>
         )}
       </ScrollView>
 
       <TouchableOpacity
-        style={[styles.continueButton, !document && styles.disabledButton]}
+        style={[styles.continueButton, (!frontDocument || !backDocument) && styles.disabledButton]}
         onPress={handleContinue}
-        disabled={!document || loading}
+        disabled={!frontDocument || !backDocument || loading}
       >
         {loading ? (
           <ActivityIndicator size="small" color="#000" />
@@ -208,10 +458,10 @@ const styles = StyleSheet.create({
     borderColor: '#DDDDDD',
     borderStyle: 'dashed',
     borderRadius: 12,
-    height: 250,
+    height: 180,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 16,
   },
   uploadIconContainer: {
     position: 'relative',
@@ -226,13 +476,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888',
   },
+  cameraButton: {
+    flexDirection: 'row',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  cameraButtonText: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 8,
+  },
   documentContainer: {
     position: 'relative',
     marginBottom: 15,
   },
   documentImage: {
     width: '100%',
-    height: 200,
+    height: 220,
     borderRadius: 12,
   },
   removeDocumentButton: {
@@ -257,22 +521,24 @@ const styles = StyleSheet.create({
   documentType: {
     fontSize: 14,
     color: '#888',
-    marginTop: 5,
+    marginTop: 4,
   },
   continueButton: {
     backgroundColor: '#FFD600',
-    borderRadius: 30,
-    margin: 20,
-    paddingVertical: 15,
+    borderRadius: 12,
+    height: 56,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#F5F5F5',
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   continueButtonText: {
-    color: '#000',
+    color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
 
