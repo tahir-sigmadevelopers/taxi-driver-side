@@ -4,7 +4,7 @@ import { Ionicons } from 'react-native-vector-icons';
 import { verifyCode, sendVerificationCode } from '../../config/firebase';
 
 const VerifyCodeScreen = ({ navigation, route }) => {
-  const { email = 'example@email.com' } = route.params || {};
+  const { email = 'example@email.com', fullName = '' } = route.params || {};
   const [code, setCode] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,8 +86,8 @@ const VerifyCodeScreen = ({ navigation, route }) => {
         return;
       }
 
-      // Navigate to complete profile on success
-      navigation.navigate('CompleteProfile');
+      // Navigate to complete profile on success with user information
+      navigation.navigate('CompleteProfile', { email, name: fullName });
     } catch (error) {
       Alert.alert('Verification Failed', 'Failed to verify code');
     } finally {

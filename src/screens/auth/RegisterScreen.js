@@ -44,7 +44,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       // Navigate to verification screen
-      navigation.navigate('VerifyCode', { email });
+      navigation.navigate('VerifyCode', { email, fullName });
     } catch (error) {
       Alert.alert('Registration Failed', error.message || 'Something went wrong');
     } finally {
