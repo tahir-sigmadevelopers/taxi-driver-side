@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import { verifyCode, sendVerificationCode } from '../../config/firebase';
 
 const VerifyCodeScreen = ({ navigation, route }) => {
   const { email = 'example@email.com' } = route.params || {};
   const [code, setCode] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(60);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
   useEffect(() => {
@@ -45,18 +47,29 @@ const VerifyCodeScreen = ({ navigation, route }) => {
     }
   };
 
-  const handleResendCode = () => {
-    // Reset timer
-    setTimer(60);
-    // Clear code fields
-    setCode(['', '', '', '']);
-    // Focus on first input
-    inputRefs[0].current.focus();
-    // Show alert
-    Alert.alert('Code Resent', 'A new verification code has been sent to your email.');
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await sendVerificationCode(email);
+      
+      if (error) {
+        Alert.alert('Error', error);
+        return;
+      }
+
+      // Reset timer and UI
+      setTimer(60);
+      setCode(['', '', '', '']);
+      inputRefs[0].current.focus();
+      Alert.alert('Code Resent', 'A new verification code has been sent to your email.');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to resend verification code');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const verificationCode = code.join('');
     
     if (verificationCode.length !== 4) {
@@ -64,8 +77,22 @@ const VerifyCodeScreen = ({ navigation, route }) => {
       return;
     }
 
-    // For demo, navigate to complete profile
-    navigation.navigate('CompleteProfile');
+    setIsLoading(true);
+    try {
+      const { error } = await verifyCode(email, verificationCode);
+      
+      if (error) {
+        Alert.alert('Verification Failed', error);
+        return;
+      }
+
+      // Navigate to complete profile on success
+      navigation.navigate('CompleteProfile');
+    } catch (error) {
+      Alert.alert('Verification Failed', 'Failed to verify code');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -105,16 +132,24 @@ const VerifyCodeScreen = ({ navigation, route }) => {
         <Text style={styles.resendText}>Didn't receive OTP?</Text>
         <TouchableOpacity 
           onPress={handleResendCode}
-          disabled={timer > 0}
+          disabled={timer > 0 || isLoading}
         >
-          <Text style={[styles.resendButton, timer > 0 && styles.disabledText]}>
+          <Text style={[styles.resendButton, (timer > 0 || isLoading) && styles.disabledText]}>
             {timer > 0 ? `Resend code (${formatTime(timer)})` : 'Resend code'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
-        <Text style={styles.verifyButtonText}>Verify</Text>
+      <TouchableOpacity 
+        style={[styles.verifyButton, isLoading && styles.disabledButton]} 
+        onPress={handleVerify}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#000" />
+        ) : (
+          <Text style={styles.verifyButtonText}>Verify</Text>
+        )}
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -205,6 +240,9 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });
 

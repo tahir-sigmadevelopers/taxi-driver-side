@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from 'react-native-vector-icons';
+import { registerWithEmailAndPassword, sendVerificationCode } from '../../config/firebase';
 
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -26,9 +27,22 @@ const RegisterScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Placeholder for actual API registration
-      // Replace with your registration logic
+      // Register user with Firebase
+      const { user, error } = await registerWithEmailAndPassword(email, password, fullName);
       
+      if (error) {
+        Alert.alert('Registration Failed', error);
+        return;
+      }
+
+      // Send verification code
+      const { error: verificationError } = await sendVerificationCode(email);
+      
+      if (verificationError) {
+        Alert.alert('Verification Failed', verificationError);
+        return;
+      }
+
       // Navigate to verification screen
       navigation.navigate('VerifyCode', { email });
     } catch (error) {
