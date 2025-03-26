@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,45 +6,117 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  StatusBar
+  StatusBar,
+  Alert,
+  ActivityIndicator,
+  Platform,
+  Linking
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
-import { CommonActions } from '@react-navigation/native';
+import * as Location from 'expo-location';
 
 const LocationPermissionScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState(null);
 
+  // Check current permission status on component mount
+  useEffect(() => {
+    checkLocationPermission();
+  }, []);
+
+  // Function to check the current location permission status
+  const checkLocationPermission = async () => {
+    try {
+      const { status } = await Location.getForegroundPermissionsAsync();
+      console.log('Current location permission status:', status);
+      setPermissionStatus(status);
+      
+      // If permissions are already granted, we can show that in the UI
+      if (status === 'granted') {
+        Alert.alert(
+          "Permission Already Granted",
+          "Location permission is already granted. You can proceed to the app.",
+          [
+            { text: "Continue", onPress: () => handleContinueToApp(true) }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error checking location permission:', error);
+    }
+  };
+
+  // Handle requesting location permission
   const handleAllowLocation = async () => {
     setLoading(true);
     try {
-      // Here you would typically request location permissions
-      // For example: await Location.requestPermissionsAsync();
+      // Request foreground location permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setPermissionStatus(status);
       
-      // For this demo, we'll just simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Navigate to main app with location permissions granted
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Main' }]
-      });
+      if (status === 'granted') {
+        // Test getting the location once to make sure it works
+        await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced
+        });
+        
+        // Navigate to main app with location permissions granted
+        handleContinueToApp(true);
+      } else {
+        // Permission was denied
+        Alert.alert(
+          "Permission Denied",
+          "Location permission is required for optimal experience. You can change this in your device settings.",
+          [
+            { text: "Settings", onPress: openLocationSettings },
+            { text: "Continue Anyway", onPress: () => handleContinueToApp(false) }
+          ]
+        );
+      }
     } catch (error) {
       console.error('Error requesting location permissions:', error);
-      // Handle error appropriately
+      Alert.alert(
+        "Error",
+        "There was an error requesting location permissions. Please try again.",
+        [{ text: "OK" }]
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMaybeLater = () => {
-    // Navigate to main app without location permissions
+  // Open device settings to enable location permissions
+  const openLocationSettings = () => {
+    // We cannot directly open settings on all platforms, but we can try
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+
+  // Navigate to main app
+  const handleContinueToApp = (locationPermissionGranted = false) => {
     navigation.reset({
       index: 0,
       routes: [{ 
         name: 'Main',
-        params: { locationPermissionGranted: false }
+        params: { locationPermissionGranted }
       }]
     });
+  };
+
+  // Handle "Maybe Later" option
+  const handleMaybeLater = () => {
+    // Show explanation about the importance of location
+    Alert.alert(
+      "Location Access Important",
+      "Without location access, some features may not work properly. You can enable location access later in app settings.",
+      [
+        { text: "Enable Now", onPress: handleAllowLocation },
+        { text: "Continue Anyway", onPress: () => handleContinueToApp(false) }
+      ]
+    );
   };
 
   return (
@@ -68,8 +140,26 @@ const LocationPermissionScreen = ({ navigation }) => {
         <Text style={styles.title}>Enable Location Access</Text>
         
         <Text style={styles.description}>
-          To ensure a seamless and efficient experience, allow us access to your location.
+          To ensure a seamless experience, we need access to your location. This helps us provide better 
+          service by finding the closest rides, estimating arrival times accurately, and ensuring safety.
         </Text>
+        
+        <View style={styles.benefitsContainer}>
+          <View style={styles.benefitItem}>
+            <Ionicons name="navigate-circle-outline" size={24} color="#FFD600" />
+            <Text style={styles.benefitText}>Find the closest rides nearby</Text>
+          </View>
+          
+          <View style={styles.benefitItem}>
+            <Ionicons name="time-outline" size={24} color="#FFD600" />
+            <Text style={styles.benefitText}>Get accurate arrival time estimates</Text>
+          </View>
+          
+          <View style={styles.benefitItem}>
+            <Ionicons name="shield-checkmark-outline" size={24} color="#FFD600" />
+            <Text style={styles.benefitText}>Enhanced safety features</Text>
+          </View>
+        </View>
       </View>
       
       <View style={styles.buttonContainer}>
@@ -78,7 +168,11 @@ const LocationPermissionScreen = ({ navigation }) => {
           onPress={handleAllowLocation}
           disabled={loading}
         >
-          <Text style={styles.allowButtonText}>Allow Location Access</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <Text  style={styles.allowButtonText}>Allow Location Access</Text>
+          )}
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -137,6 +231,21 @@ const styles = StyleSheet.create({
     color: '#666666',
     textAlign: 'center',
     lineHeight: 24,
+    marginBottom: 30,
+  },
+  benefitsContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  benefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  benefitText: {
+    fontSize: 16,
+    color: '#333333',
+    marginLeft: 12,
   },
   buttonContainer: {
     paddingHorizontal: 20,
@@ -147,7 +256,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingVertical: 15,
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
+    marginTop: 45,
   },
   allowButtonText: {
     color: '#000000',

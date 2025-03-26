@@ -8,9 +8,12 @@ import {
   Image,
   Dimensions,
   StatusBar,
-  Platform
+  Platform,
+  Alert,
+  Linking
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import * as Location from 'expo-location';
 
 // Mock map component (in a real app, you'd use react-native-maps)
 const MapView = ({ children, style }) => (
@@ -22,14 +25,104 @@ const MapView = ({ children, style }) => (
 
 const RidesScreen = ({ navigation, route }) => {
   // Parameters from navigation
-  const locationPermissionGranted = route.params?.locationPermissionGranted !== false;
+  const initialLocationPermissionGranted = route.params?.locationPermissionGranted === true;
   
   // State
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(false); // Start offline if no location permission
   const [preBookedRides, setPreBookedRides] = useState(10);
   const [todayEarnings, setTodayEarnings] = useState(754);
   const [countdownSeconds, setCountdownSeconds] = useState(30);
-  const [showRideRequest, setShowRideRequest] = useState(true);
+  const [showRideRequest, setShowRideRequest] = useState(false); // Don't show ride requests until online
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(initialLocationPermissionGranted);
+  const [userLocation, setUserLocation] = useState(null);
+  
+  // Check location permission on mount
+  useEffect(() => {
+    checkLocationPermission();
+  }, []);
+  
+  // When locationPermissionGranted changes, update isOnline status
+  useEffect(() => {
+    if (locationPermissionGranted) {
+      getLocation();
+    } else {
+      setIsOnline(false);
+    }
+  }, [locationPermissionGranted]);
+  
+  // Function to check if location permission is granted
+  const checkLocationPermission = async () => {
+    try {
+      const { status } = await Location.getForegroundPermissionsAsync();
+      console.log('Location permission status in RidesScreen:', status);
+      setLocationPermissionGranted(status === 'granted');
+    } catch (error) {
+      console.error('Error checking location permission:', error);
+      setLocationPermissionGranted(false);
+    }
+  };
+  
+  // Function to request location permission
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      console.log('Location permission request result:', status);
+      setLocationPermissionGranted(status === 'granted');
+      
+      if (status === 'granted') {
+        getLocation();
+      } else {
+        Alert.alert(
+          "Location Permission Required",
+          "We need location access to connect you with nearby rides. Please enable location access in your device settings.",
+          [
+            { text: "Open Settings", onPress: openLocationSettings },
+            { text: "Cancel", style: "cancel" }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error requesting location permission:', error);
+    }
+  };
+  
+  // Function to open device settings for location
+  const openLocationSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+  
+  // Function to get user's current location
+  const getLocation = async () => {
+    try {
+      if (!locationPermissionGranted) {
+        console.log('Location permission not granted, cannot get location');
+        return;
+      }
+      
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced
+      });
+      
+      console.log('Got user location:', location.coords);
+      setUserLocation(location.coords);
+      
+      // Now that we have location, allow user to go online
+      setIsOnline(true);
+      // Show the ride request after getting location (in a real app, this would come from the server)
+      setShowRideRequest(true);
+    } catch (error) {
+      console.error('Error getting location:', error);
+      Alert.alert(
+        "Error",
+        "Failed to get your location. Please check your device settings and try again.",
+        [{ text: "OK" }]
+      );
+    }
+  };
   
   // Mock countdown timer
   useEffect(() => {
@@ -46,7 +139,19 @@ const RidesScreen = ({ navigation, route }) => {
   }, [countdownSeconds, showRideRequest]);
   
   const handleToggleOnline = () => {
-    setIsOnline(!isOnline);
+    if (!locationPermissionGranted) {
+      requestLocationPermission();
+      return;
+    }
+    
+    if (!isOnline) {
+      // Going online
+      getLocation();
+    } else {
+      // Going offline
+      setIsOnline(false);
+      setShowRideRequest(false);
+    }
   };
   
   const handleAcceptRide = () => {
@@ -93,6 +198,27 @@ const RidesScreen = ({ navigation, route }) => {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       <MapView style={styles.mapView} />
+      
+      {/* Location Permission Overlay */}
+      {!locationPermissionGranted && (
+        <View style={styles.permissionOverlay}>
+          <View style={styles.permissionCard}>
+            <View style={styles.permissionIconContainer}>
+              <Ionicons name="location" size={50} color="#FFD600" />
+            </View>
+            <Text style={styles.permissionTitle}>Location Access Required</Text>
+            <Text style={styles.permissionDescription}>
+              We need access to your location to connect you with nearby rides and provide accurate pickup times.
+            </Text>
+            <TouchableOpacity
+              style={styles.permissionButton}
+              onPress={requestLocationPermission}
+            >
+              <Text style={styles.permissionButtonText}>Enable Location Access</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
       
       {/* Countdown timer circle - moved outside MapView */}
       {showRideRequest && (
@@ -549,6 +675,67 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+  },
+  permissionOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+    padding: 20,
+  },
+  permissionCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 30,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 350,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 10,
+  },
+  permissionIconContainer: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  permissionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  permissionDescription: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 22,
+  },
+  permissionButton: {
+    backgroundColor: '#FFD600',
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    width: '100%',
+    alignItems: 'center',
+  },
+  permissionButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000000',
   },
 });
 
