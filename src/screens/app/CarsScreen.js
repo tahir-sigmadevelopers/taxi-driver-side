@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,51 +8,144 @@ import {
   Image,
   ScrollView,
   StatusBar,
-  Platform
+  Platform,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import carService from '../../services/carService';
 
 const CarsScreen = ({ navigation }) => {
-  // Mock car data
-  const carData = {
-    model: 'Maruti Suzuki Swift (VX!)',
-    category: 'Mini',
-    capacity: '4',
-    fuelType: 'Petrol',
-    lastUpdated: '6 Jun 2023',
-    status: 'Under Verification',
-    image: 'https://i.ibb.co/rsMxqZf/maruti-swift.png', // Example image URL
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCars();
+  }, []);
+
+  const fetchCars = async () => {
+    try {
+      setLoading(true);
+      console.log('fetching cars');
+      
+      const response = await carService.getAllCars();
+      if (response.success) {
+        setCars(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching cars:', error);
+      Alert.alert('Error', 'Failed to fetch cars');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleEdit = () => {
-    // Navigate to car documents screen
-    navigation.navigate('CarDocumentsScreen');
+  const handleEdit = (car) => {
+    // Navigate to edit car screen with car data
+    navigation.navigate('AddNewCarScreen', { car });
   };
 
-  const handleDelete = () => {
-    // Show confirmation dialog and delete car
-    console.log('Delete car pressed');
+  const handleDelete = async (carId) => {
+    Alert.alert('Delete Car', 'Are you sure you want to delete this car?', [
+      { 
+        text: 'Cancel', 
+        style: 'cancel' 
+      },
+      { 
+        text: 'Delete', 
+        style: 'destructive', 
+        onPress: async () => {
+          try {
+            await carService.deleteCar(carId);
+            // Refresh the cars list
+            fetchCars();
+            Alert.alert('Success', 'Car deleted successfully');
+          } catch (error) {
+            Alert.alert('Error', error.message || 'Failed to delete car');
+          }
+        }
+      }
+    ]);
   };
 
   const handleAddNewCar = () => {
     navigation.navigate('AddNewCarScreen');
   };
 
-  // make api request on useeffect to get all cars 
-  useEffect(() => {
-    //  make a function to fetch cars
-    const fetchCars = async () => {
-      try {
-        console.log('fetching drivers');
-        const response = await fetch('http://192.168.18.19:5000/api/drivers');
-        const data = await response.json();
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching cars:', error.response.data);
-      }
-    }
-    fetchCars();
-  }, []);
+  const renderCarCard = (car) => (
+    <View key={car._id} style={styles.carCard}>
+      {/* Car Details Section */}
+      <View style={styles.carDetailsSection}>
+        {/* Car Image */}
+        <View style={styles.carImageContainer}>
+          {car.images && car.images.length > 0 ? (
+            <Image
+              source={{ uri: car.images[0] }}
+              style={styles.carImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <Ionicons name="car" size={50} color="#FFD600" />
+          )}
+        </View>
+
+        {/* Car Info */}
+        <View style={styles.carInfoContainer}>
+          {/* Verification Badge */}
+          <View style={styles.verificationBadge}>
+            <Text style={styles.verificationText}>Active</Text>
+          </View>
+
+          {/* Car Model */}
+          <Text style={styles.carModel}>{car.name}</Text>
+
+          {/* Car Category */}
+          <Text style={styles.carCategory}>{car.type}</Text>
+
+          {/* Car Features */}
+          <View style={styles.carFeatures}>
+            {/* Fuel Type */}
+            <View style={styles.featureItem}>
+              <Ionicons name="car" size={18} color="#FFD600" />
+              <Text style={styles.featureText}>{car.fuelType}</Text>
+            </View>
+
+            {/* Car Number */}
+            <View style={styles.featureItem}>
+              <Ionicons name="document-text" size={18} color="#FFD600" />
+              <Text style={styles.featureText}>{car.number}</Text>
+            </View>
+          </View>
+
+          {/* Features List */}
+          <View style={styles.featuresList}>
+            {car.features && car.features.map((feature, index) => (
+              <View key={index} style={styles.featureTag}>
+                <Text style={styles.featureTagText}>{feature}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      {/* Action Buttons */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity 
+          style={styles.editButton} 
+          onPress={() => handleEdit(car)}
+        >
+          <Text style={styles.editButtonText}>Edit</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.deleteButton} 
+          onPress={() => handleDelete(car._id)}
+        >
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -70,65 +163,27 @@ const CarsScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Cars</Text>
       </View>
 
-      <ScrollView style={styles.scrollContainer}>
-        {/* Car Card */}
-        <View style={styles.carCard}>
-          {/* Car Details Section */}
-          <View style={styles.carDetailsSection}>
-            {/* Car Image */}
-            <View style={styles.carImageContainer}>
-              <Image
-                source={{ uri: carData.image }}
-                style={styles.carImage}
-                resizeMode="contain"
-              />
-            </View>
-
-            {/* Car Info */}
-            <View style={styles.carInfoContainer}>
-              {/* Verification Badge */}
-              <View style={styles.verificationBadge}>
-                <Text style={styles.verificationText}>{carData.status}</Text>
-              </View>
-
-              {/* Car Model */}
-              <Text style={styles.carModel}>{carData.model}</Text>
-
-              {/* Car Category */}
-              <Text style={styles.carCategory}>{carData.category}</Text>
-
-              {/* Car Features */}
-              <View style={styles.carFeatures}>
-                {/* Capacity */}
-                <View style={styles.featureItem}>
-                  <Ionicons name="person" size={18} color="#FFD600" />
-                  <Text style={styles.featureText}>{carData.capacity}</Text>
-                </View>
-
-                {/* Fuel Type */}
-                <View style={styles.featureItem}>
-                  <Ionicons name="car" size={18} color="#FFD600" />
-                  <Text style={styles.featureText}>{carData.fuelType}</Text>
-                </View>
-              </View>
-
-              {/* Last Updated */}
-              <Text style={styles.lastUpdated}>Last Updated {carData.lastUpdated}</Text>
-            </View>
-          </View>
-
-          {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-              <Text style={styles.editButtonText}>Edit</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-              <Text style={styles.deleteButtonText}>Delete</Text>
-            </TouchableOpacity>
-          </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FFD600" />
         </View>
-      </ScrollView>
+      ) : (
+        <ScrollView style={styles.scrollContainer}>
+          {cars.length > 0 ? (
+            cars.map(renderCarCard)
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No cars found</Text>
+              <TouchableOpacity 
+                style={styles.addFirstCarButton}
+                onPress={handleAddNewCar}
+              >
+                <Text style={styles.addFirstCarButtonText}>Add Your First Car</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </ScrollView>
+      )}
 
       {/* Add New Car Button */}
       <TouchableOpacity
@@ -292,6 +347,50 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 20,
+  },
+  addFirstCarButton: {
+    backgroundColor: '#FFD600',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  addFirstCarButtonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  featuresList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 10,
+  },
+  featureTag: {
+    backgroundColor: '#FFF9D9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  featureTagText: {
+    color: '#FFB800',
+    fontSize: 12,
   },
 });
 
