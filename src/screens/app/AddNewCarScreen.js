@@ -10,9 +10,11 @@ import {
   StatusBar,
   Platform,
   Modal,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import carService from '../../services/carService';
 
 // Car type options
 const CAR_TYPES = [
@@ -61,7 +63,7 @@ const AddNewCarScreen = ({ navigation }) => {
     type: '',
     number: '',
     fuelType: '',
-    tags: [],
+    features: [],
   });
 
   // Modal visibility states
@@ -78,10 +80,36 @@ const AddNewCarScreen = ({ navigation }) => {
     navigation.navigate('CarImagesScreen');
   };
 
-  const handleAddNewCar = () => {
-    // Add new car logic
-    console.log('Add new car pressed with data:', carData);
-    navigation.goBack();
+  const handleAddNewCar = async () => {
+    try {
+      // Validate required fields
+      if (!carData.name || !carData.type || !carData.number || !carData.fuelType) {
+        Alert.alert('Error', 'Please fill in all required fields');
+        return;
+      }
+
+      // Format the data for API
+      const apiData = {
+        name: carData.name,
+        type: carData.type.toLowerCase(),
+        number: carData.number,
+        fuelType: carData.fuelType.toLowerCase(),
+        features: carData.features.map(feature => feature.id),
+        images: [], // Optional for now
+        documents: [] // Optional for now
+      };
+
+      // Call the API
+      const response = await carService.addCar(apiData);
+
+      if (response.success) {
+        Alert.alert('Success', 'Car added successfully', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Failed to add car');
+    }
   };
 
   // Handle car type selection
@@ -98,7 +126,7 @@ const AddNewCarScreen = ({ navigation }) => {
 
   // Handle tag selection (toggle)
   const handleToggleTag = (item) => {
-    const currentTags = [...carData.tags];
+    const currentTags = [...carData.features];
     const tagIndex = currentTags.findIndex(tag => tag.id === item.id);
     
     if (tagIndex >= 0) {
@@ -109,18 +137,18 @@ const AddNewCarScreen = ({ navigation }) => {
       currentTags.push(item);
     }
     
-    setCarData({...carData, tags: currentTags});
+    setCarData({...carData, features: currentTags});
   };
 
   // Remove a tag
   const handleRemoveTag = (tagId) => {
-    const updatedTags = carData.tags.filter(tag => tag.id !== tagId);
-    setCarData({...carData, tags: updatedTags});
+    const updatedTags = carData.features.filter(tag => tag.id !== tagId);
+    setCarData({...carData, features: updatedTags});
   };
 
   // Check if a tag is selected
   const isTagSelected = (tagId) => {
-    return carData.tags.some(tag => tag.id === tagId);
+    return carData.features.some(tag => tag.id === tagId);
   };
 
   // Generic modal component for selection
@@ -260,16 +288,16 @@ const AddNewCarScreen = ({ navigation }) => {
             style={styles.dropdownInput}
             onPress={() => setTagsModalVisible(true)}
           >
-            <Text style={carData.tags.length > 0 ? styles.inputText : styles.placeholderText}>
-              {carData.tags.length > 0 ? `${carData.tags.length} features selected` : 'Select Features'}
+            <Text style={carData.features.length > 0 ? styles.inputText : styles.placeholderText}>
+              {carData.features.length > 0 ? `${carData.features.length} features selected` : 'Select Features'}
             </Text>
             <Ionicons name="chevron-down" size={24} color="#FFD600" />
           </TouchableOpacity>
           
           {/* Display selected tags */}
-          {carData.tags.length > 0 && (
+          {carData.features.length > 0 && (
             <View style={styles.tagsContainer}>
-              {carData.tags.map(tag => (
+              {carData.features.map(tag => (
                 <View key={tag.id} style={styles.tagItem}>
                   <Text style={styles.tagText}>{tag.label}</Text>
                   <TouchableOpacity 

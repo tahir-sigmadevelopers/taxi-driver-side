@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -38,22 +38,38 @@ const CarsScreen = ({ navigation }) => {
     navigation.navigate('AddNewCarScreen');
   };
 
+  // make api request on useeffect to get all cars 
+  useEffect(() => {
+    //  make a function to fetch cars
+    const fetchCars = async () => {
+      try {
+        console.log('fetching drivers');
+        const response = await fetch('http://192.168.18.19:5000/api/drivers');
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error('Error fetching cars:', error.response.data);
+      }
+    }
+    fetchCars();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
+
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
-        
+
         <Text style={styles.headerTitle}>Cars</Text>
       </View>
-      
+
       <ScrollView style={styles.scrollContainer}>
         {/* Car Card */}
         <View style={styles.carCard}>
@@ -61,26 +77,26 @@ const CarsScreen = ({ navigation }) => {
           <View style={styles.carDetailsSection}>
             {/* Car Image */}
             <View style={styles.carImageContainer}>
-              <Image 
-                source={{ uri: carData.image }} 
+              <Image
+                source={{ uri: carData.image }}
                 style={styles.carImage}
                 resizeMode="contain"
               />
             </View>
-            
+
             {/* Car Info */}
             <View style={styles.carInfoContainer}>
               {/* Verification Badge */}
               <View style={styles.verificationBadge}>
                 <Text style={styles.verificationText}>{carData.status}</Text>
               </View>
-              
+
               {/* Car Model */}
               <Text style={styles.carModel}>{carData.model}</Text>
-              
+
               {/* Car Category */}
               <Text style={styles.carCategory}>{carData.category}</Text>
-              
+
               {/* Car Features */}
               <View style={styles.carFeatures}>
                 {/* Capacity */}
@@ -88,34 +104,34 @@ const CarsScreen = ({ navigation }) => {
                   <Ionicons name="person" size={18} color="#FFD600" />
                   <Text style={styles.featureText}>{carData.capacity}</Text>
                 </View>
-                
+
                 {/* Fuel Type */}
                 <View style={styles.featureItem}>
                   <Ionicons name="car" size={18} color="#FFD600" />
                   <Text style={styles.featureText}>{carData.fuelType}</Text>
                 </View>
               </View>
-              
+
               {/* Last Updated */}
               <Text style={styles.lastUpdated}>Last Updated {carData.lastUpdated}</Text>
             </View>
           </View>
-          
+
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
               <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
               <Text style={styles.deleteButtonText}>Delete</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-      
+
       {/* Add New Car Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.addButton}
         onPress={handleAddNewCar}
       >
