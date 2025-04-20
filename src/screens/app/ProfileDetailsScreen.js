@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,24 +9,73 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
-  Platform
+  Platform,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons';
+import userService from '../../services/userService';
 
 const ProfileDetailsScreen = ({ navigation }) => {
-  // Mock user data
   const [userData, setUserData] = useState({
-    name: 'Jenny Wilson',
-    phone: '603.555.0123',
-    email: 'example@gmail.com',
-    city: 'Jersey City, New Jersey City'
+    name: '',
+    phoneNumber: '',
+    email: '',
+    city: ''
   });
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
-  const handleUpdate = () => {
-    // In a real app, this would send the updated profile to an API
-    console.log('Profile updated:', userData);
-    navigation.goBack();
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await userService.getUserProfile();
+      if (response.success) {
+        setUserData({
+          name: response.data.name || '',
+          phoneNumber: response.data.phoneNumber || '',
+          email: response.data.email || '',
+          city: response.data.city || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      Alert.alert('Error', 'Failed to load profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleUpdate = async () => {
+    try {
+      setUpdating(true);
+      const response = await userService.updateUserProfile(userData);
+      if (response.success) {
+        Alert.alert('Success', 'Profile updated successfully', [
+          { text: 'OK', onPress: () => navigation.goBack() }
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Failed to update profile');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FFD600" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,7 +97,7 @@ const ProfileDetailsScreen = ({ navigation }) => {
         {/* Profile Image */}
         <View style={styles.profileImageContainer}>
           <Image 
-            source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }} 
+            source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }} 
             style={styles.profileImage} 
           />
           <TouchableOpacity style={styles.editProfileButton}>
@@ -65,6 +114,7 @@ const ProfileDetailsScreen = ({ navigation }) => {
               style={styles.textInput}
               value={userData.name}
               onChangeText={(text) => setUserData({...userData, name: text})}
+              placeholder="Enter your name"
             />
           </View>
           
@@ -74,10 +124,10 @@ const ProfileDetailsScreen = ({ navigation }) => {
             <View style={styles.phoneContainer}>
               <TextInput
                 style={styles.phoneInput}
-                value={userData.phone}
-                onChangeText={(text) => setUserData({...userData, phone: text})}
+                value={userData.phoneNumber}
+                onChangeText={(text) => setUserData({...userData, phoneNumber: text})}
                 keyboardType="phone-pad"
-                editable={false} // Usually phone numbers can't be edited directly
+                placeholder="Enter your phone number"
               />
               <TouchableOpacity style={styles.changeButton}>
                 <Text style={styles.changeButtonText}>Change</Text>
@@ -94,16 +144,19 @@ const ProfileDetailsScreen = ({ navigation }) => {
               onChangeText={(text) => setUserData({...userData, email: text})}
               keyboardType="email-address"
               autoCapitalize="none"
+              placeholder="Enter your email"
             />
           </View>
           
           {/* City Field */}
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>City You Drive In</Text>
-            <TouchableOpacity style={styles.dropdownInput}>
-              <Text style={styles.dropdownText}>{userData.city}</Text>
-              <Ionicons name="chevron-down" size={24} color="#FFD600" />
-            </TouchableOpacity>
+            <TextInput
+              style={styles.textInput}
+              value={userData.city}
+              onChangeText={(text) => setUserData({...userData, city: text})}
+              placeholder="Enter your city"
+            />
           </View>
           
           {/* Document Details */}
@@ -122,8 +175,16 @@ const ProfileDetailsScreen = ({ navigation }) => {
       
       {/* Update Button */}
       <View style={styles.updateButtonContainer}>
-        <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-          <Text style={styles.updateButtonText}>Update</Text>
+        <TouchableOpacity 
+          style={[styles.updateButton, updating && styles.updatingButton]} 
+          onPress={handleUpdate}
+          disabled={updating}
+        >
+          {updating ? (
+            <ActivityIndicator size="small" color="#000000" />
+          ) : (
+            <Text style={styles.updateButtonText}>Update</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -134,6 +195,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -238,20 +304,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-  dropdownInput: {
-    height: 55,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: '#000000',
-  },
   documentButton: {
     height: 55,
     borderWidth: 1,
@@ -264,7 +316,7 @@ const styles = StyleSheet.create({
   },
   documentButtonText: {
     fontSize: 16,
-    color: '#000000',
+    color: '#999999',
   },
   updateButtonContainer: {
     padding: 20,
@@ -274,9 +326,12 @@ const styles = StyleSheet.create({
   updateButton: {
     backgroundColor: '#FFD600',
     height: 55,
-    borderRadius: 50,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  updatingButton: {
+    opacity: 0.7,
   },
   updateButtonText: {
     color: '#000000',
