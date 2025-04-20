@@ -168,7 +168,7 @@ const CarsScreen = ({ navigation }) => {
           <ActivityIndicator size="large" color="#FFD600" />
         </View>
       ) : (
-        <ScrollView style={styles.scrollContainer}>
+      <ScrollView style={styles.scrollContainer}>
           {cars.length > 0 ? (
             cars.map(renderCarCard)
           ) : (
@@ -182,7 +182,7 @@ const CarsScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           )}
-        </ScrollView>
+      </ScrollView>
       )}
 
       {/* Add New Car Button */}
