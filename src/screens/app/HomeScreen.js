@@ -29,7 +29,8 @@ const HomeScreen = ({ navigation, route }) => {
   const [preBookedRides, setPreBookedRides] = useState(10);
   const [todayEarnings, setTodayEarnings] = useState(754);
   const [countdownSeconds, setCountdownSeconds] = useState(30);
-  const [showRideRequest, setShowRideRequest] = useState(true);
+  const [showRideRequest, setShowRideRequest] = useState(false);
+  const [availableRides, setAvailableRides] = useState(5);
   
   // Mock countdown timer
   useEffect(() => {
@@ -87,6 +88,11 @@ const HomeScreen = ({ navigation, route }) => {
   const handleDeclineRide = () => {
     setShowRideRequest(false);
     // In a real app, you'd notify the backend that the ride was declined
+  };
+  
+  // Navigate to Ride Requests Screen
+  const navigateToRideRequests = () => {
+    navigation.navigate('RideRequestsScreen');
   };
 
   return (
@@ -146,6 +152,21 @@ const HomeScreen = ({ navigation, route }) => {
               <Text style={styles.countdownLabel}>Seconds</Text>
             </View>
           </View>
+        )}
+        
+        {/* Ride Requests Button (shown when no active ride request) */}
+        {!showRideRequest && isOnline && (
+          <TouchableOpacity 
+            style={styles.rideRequestsButton}
+            onPress={navigateToRideRequests}
+          >
+            <View style={styles.rideRequestsButtonContent}>
+              <Ionicons name="car" size={24} color="#FFFFFF" />
+              <Text style={styles.rideRequestsButtonText}>
+                See Ride Requests ({availableRides})
+              </Text>
+            </View>
+          </TouchableOpacity>
         )}
       </MapView>
       
@@ -538,6 +559,30 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 16,
     fontWeight: '600',
+  },
+  rideRequestsButton: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  rideRequestsButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rideRequestsButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
 });
 

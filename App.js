@@ -3,6 +3,8 @@ import { LogBox, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 import AppStack from './src/navigation/AppStack';
 import AuthStack from './src/navigation/AuthStack';
 import RideInProgressScreen from './src/screens/app/RideInProgressScreen';
@@ -12,6 +14,17 @@ import OTPVerificationScreen from './src/screens/app/OTPVerificationScreen';
 import DestinationScreen from './src/screens/app/DestinationScreen';
 import CashCollectionScreen from './src/screens/app/CashCollectionScreen';
 import RateRiderScreen from './src/screens/app/RateRiderScreen';
+import HomeScreen from './src/screens/app/HomeScreen';
+import ProfileScreen from './src/screens/app/ProfileDetailsScreen';
+import LoginScreen from './src/screens/auth/LoginScreen';
+import RegisterScreen from './src/screens/auth/RegisterScreen';
+import EarningsScreen from './src/screens/app/EarningsScreen';
+import RidesScreen from './src/screens/app/RidesScreen';
+import SettingsScreen from './src/screens/app/SettingsScreen';
+import NotificationScreen from './src/screens/app/NotificationScreen';
+import CarsScreen from './src/screens/app/CarsScreen';
+import CarDocumentsScreen from './src/screens/app/CarDocumentsScreen';
+import RideRequestsScreen from './src/screens/app/RideRequestsScreen';
 
 // Ignore specific warnings (optional)
 LogBox.ignoreLogs([
@@ -41,6 +54,40 @@ export const authService = {
 };
 
 const RootStack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Main app tabs
+const MainTabs = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Earnings') {
+            iconName = focused ? 'wallet' : 'wallet-outline';
+          } else if (route.name === 'History') {
+            iconName = focused ? 'time' : 'time-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#4CAF50',
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Earnings" component={EarningsScreen} />
+      <Tab.Screen name="History" component={RidesScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+};
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -110,35 +157,19 @@ export default function App() {
           <RootStack.Navigator screenOptions={{ headerShown: false }}>
             {isAuthenticated ? (
               <>
-                <RootStack.Screen name="Main" component={AppStack} />
-                <RootStack.Screen 
-                  name="RideInProgressScreen" 
-                  component={RideInProgressScreen} 
-                />
-                <RootStack.Screen 
-                  name="DirectionScreen" 
-                  component={DirectionScreen} 
-                />
-                <RootStack.Screen 
-                  name="ArrivalScreen" 
-                  component={ArrivalScreen} 
-                />
-                <RootStack.Screen 
-                  name="OTPVerificationScreen" 
-                  component={OTPVerificationScreen} 
-                />
-                <RootStack.Screen 
-                  name="DestinationScreen" 
-                  component={DestinationScreen} 
-                />
-                <RootStack.Screen 
-                  name="CashCollectionScreen" 
-                  component={CashCollectionScreen} 
-                />
-                <RootStack.Screen 
-                  name="RateRiderScreen" 
-                  component={RateRiderScreen} 
-                />
+                <RootStack.Screen name="Main" component={MainTabs} />
+                <RootStack.Screen name="RideInProgressScreen" component={RideInProgressScreen} />
+                <RootStack.Screen name="RideRequestsScreen" component={RideRequestsScreen} />
+                <RootStack.Screen name="DirectionScreen" component={DirectionScreen} />
+                <RootStack.Screen name="ArrivalScreen" component={ArrivalScreen} />
+                <RootStack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
+                <RootStack.Screen name="RideCompleteScreen" component={CashCollectionScreen} />
+                <RootStack.Screen name="RatingScreen" component={RateRiderScreen} />
+                <RootStack.Screen name="DestinationScreen" component={DestinationScreen} />
+                <RootStack.Screen name="Settings" component={SettingsScreen} />
+                <RootStack.Screen name="Notifications" component={NotificationScreen} />
+                <RootStack.Screen name="Vehicle" component={CarsScreen} />
+                <RootStack.Screen name="Documents" component={CarDocumentsScreen} />
               </>
             ) : (
               <RootStack.Screen name="Auth" component={AuthStack} />
